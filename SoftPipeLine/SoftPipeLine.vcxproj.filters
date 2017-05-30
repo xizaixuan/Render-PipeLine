@@ -1,2 +1,33 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" />
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="FrameWork·">
+      <UniqueIdentifier>{2e218f30-a187-453a-81d8-1a36116d15bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Util">
+      <UniqueIdentifier>{69a8a8a3-9db2-476a-b658-43aa1f1cdf0e}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="FrameWork\Engine.cpp">
+      <Filter>FrameWork·</Filter>
+    </ClCompile>
+    <ClCompile Include="FrameWork\Main.cpp">
+      <Filter>FrameWork·</Filter>
+    </ClCompile>
+    <ClCompile Include="FrameWork\WinApp.cpp">
+      <Filter>FrameWork·</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="FrameWork\Engine.h">
+      <Filter>FrameWork·</Filter>
+    </ClInclude>
+    <ClInclude Include="FrameWork\WinApp.h">
+      <Filter>FrameWork·</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\Singleton.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

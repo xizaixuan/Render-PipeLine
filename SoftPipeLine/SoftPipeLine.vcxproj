@@ -18,6 +18,16 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="FrameWork\Engine.cpp" />
+    <ClCompile Include="FrameWork\Main.cpp" />
+    <ClCompile Include="FrameWork\WinApp.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="FrameWork\Engine.h" />
+    <ClInclude Include="FrameWork\WinApp.h" />
+    <ClInclude Include="Util\Singleton.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{AD88F86D-15AF-4D5D-AE60-093A168F1066}</ProjectGuid>
