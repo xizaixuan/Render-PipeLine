@@ -26,10 +26,6 @@ public:
 
 	/// \brief 更新
 	void update(float dt);
-
-private:
-	/// \brief 创建窗口
-	void createWin(HINSTANCE hInstance, int nCmdShow);
 };
 
 

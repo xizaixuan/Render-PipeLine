@@ -43,7 +43,7 @@ private:
 	///	窗口名称
 	LPSTR	mCaption;
 
-	///	窗口长度
+	///	窗口高度
 	int		mHeight;
 
 	///	窗口宽度
