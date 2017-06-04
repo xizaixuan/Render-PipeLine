@@ -7,6 +7,9 @@
     <Filter Include="Util">
       <UniqueIdentifier>{69a8a8a3-9db2-476a-b658-43aa1f1cdf0e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Math">
+      <UniqueIdentifier>{1b225a1c-2439-426a-97b9-b44b47dfe07d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FrameWork\Engine.cpp">
@@ -21,6 +24,21 @@
     <ClCompile Include="FrameWork\RenderDevice.cpp">
       <Filter>FrameWork·</Filter>
     </ClCompile>
+    <ClCompile Include="Math\Vector2.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\Vector3.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\Vector4.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\Matrix4.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\MathUtil.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FrameWork\Engine.h">
@@ -34,6 +52,21 @@
     </ClInclude>
     <ClInclude Include="FrameWork\RenderDevice.h">
       <Filter>FrameWork·</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\MathUtil.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Vector2.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Vector3.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Vector4.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Matrix4.h">
+      <Filter>Math</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

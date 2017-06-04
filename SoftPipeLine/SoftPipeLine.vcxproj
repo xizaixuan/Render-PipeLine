@@ -23,11 +23,21 @@
     <ClCompile Include="FrameWork\Main.cpp" />
     <ClCompile Include="FrameWork\RenderDevice.cpp" />
     <ClCompile Include="FrameWork\WinApp.cpp" />
+    <ClCompile Include="Math\MathUtil.cpp" />
+    <ClCompile Include="Math\Matrix4.cpp" />
+    <ClCompile Include="Math\Vector2.cpp" />
+    <ClCompile Include="Math\Vector3.cpp" />
+    <ClCompile Include="Math\Vector4.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FrameWork\Engine.h" />
     <ClInclude Include="FrameWork\RenderDevice.h" />
     <ClInclude Include="FrameWork\WinApp.h" />
+    <ClInclude Include="Math\MathUtil.h" />
+    <ClInclude Include="Math\Matrix4.h" />
+    <ClInclude Include="Math\Vector2.h" />
+    <ClInclude Include="Math\Vector3.h" />
+    <ClInclude Include="Math\Vector4.h" />
     <ClInclude Include="Util\Singleton.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
