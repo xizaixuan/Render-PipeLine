@@ -3,12 +3,11 @@
 #include <memory.h>
 #include "MathUtil.h"
 
-//默认构造函数
+
 Matrix4::Matrix4(void)
 {
 }
 
-//带参数构造函数
 Matrix4::Matrix4(
 	float m00, float m01, float m02, float m03,
 	float m10, float m11, float m12, float m13,
@@ -24,7 +23,6 @@ Matrix4::~Matrix4(void)
 {
 }
 
-//重载赋值运算符,并返回引用，以实现左值
 Matrix4& Matrix4::operator =(const Matrix4& a)
 {
 	memcpy((void *)(this), (void *)(&a), sizeof(Matrix4));
@@ -32,7 +30,6 @@ Matrix4& Matrix4::operator =(const Matrix4& a)
 	return *this;
 }
 
-//重载二元"+"运算符
 Matrix4 Matrix4::operator +(const Matrix4& a) const
 {
 	Matrix4 result;
@@ -46,7 +43,6 @@ Matrix4 Matrix4::operator +(const Matrix4& a) const
 	return result;
 }
 
-//重载二元"*"运算符 
 Matrix4 Matrix4::operator *(const Matrix4& a) const
 {
 	Matrix4 result;
@@ -67,7 +63,6 @@ Matrix4 Matrix4::operator *(const Matrix4& a) const
 	return result;
 }
 
-//置为单位矩阵
 void Matrix4::identity()
 {
 	M[0][0] = M[1][1] = M[2][2] = M[3][3] = 1.0f;
@@ -77,7 +72,6 @@ void Matrix4::identity()
 	M[3][0] = M[3][1] = M[3][2] = 0.0f;
 }
 
-//初始化
 void Matrix4::init(
 	float m00, float m01, float m02, float m03,
 	float m10, float m11, float m12, float m13,
@@ -91,7 +85,6 @@ void Matrix4::init(
 	
 }
 
-//计算矩阵的逆
 Matrix4 Matrix4::inverse()
 {
 	// 计算该矩阵的逆矩阵
@@ -129,4 +122,18 @@ Matrix4 Matrix4::inverse()
 	}
 
 	return mi;
+}
+
+void Matrix4::setTranslate(float x, float y, float z)
+{
+	M30 = x;
+	M31 = y;
+	M32 = z;
+}
+
+void Matrix4::setTranslate(Vector3 pos)
+{
+	M30 = pos.x;
+	M31 = pos.y;
+	M32 = pos.z;
 }

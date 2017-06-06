@@ -1,7 +1,7 @@
 /////////////////////////////////////////////////////////////////////////////////
 /// Copyright (C), 2017, zhangxuan. All rights reserved.
 /// \brief   四维向量
-/// \author  zhangxuan
+/// \author  xizaixuan
 /// \date    2017-06
 /////////////////////////////////////////////////////////////////////////////////
 #ifndef _Vector4_H_
@@ -31,9 +31,6 @@ public:
 	/// \brief 重载赋值运算符,并返回引用，以实现左值
 	Vector4& operator = (const Vector4& a);
 
-	/// \brief 重载赋值运算符,并返回引用，以实现左值
-	Vector4& operator = (const Vector3& a);
-
 	/// \brief 重载二元"+"运算符
 	Vector4 operator +(const Vector4& a) const;
 
@@ -50,22 +47,12 @@ public:
 	Vector4 operator *(const Matrix4& a) const;
 
 public:
-	/// \brief 置为零向量
-	void zero();
-
-	/// \brief 初始化
-	void init(float x,float y,float z);
-
-	/// \brief 初始化
-	void init(float x,float y,float z,float w);
-
-	/// \brief 向量标准化
-	void normalize();
-
 	/// \brief 标准齐次空间变换
-	void Homogenous();
+	void homogenous();
 
 public:
+
+	///	数据分量
 	union
 	{
 		float M[4]; 

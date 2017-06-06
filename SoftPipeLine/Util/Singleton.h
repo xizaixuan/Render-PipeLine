@@ -17,14 +17,7 @@ template<typename T>
 class Singleton
 {
 public:
-
-	//************************************
-	// Method:    getSingletonPtr
-	// FullName:  Singleton<T>::getSingletonPtr
-	// Access:    public static 
-	// Returns:   T*
-	// Qualifier:
-	//************************************
+	/// brief 获取单例指针
 	static T* getSingletonPtr()
 	{
 		static T mSingleton;
@@ -32,7 +25,10 @@ public:
 	}
 
 protected:
+	/// brief 构造函数
 	Singleton(void){}
+
+	/// brief 析构函数
 	~Singleton(void){}
 };
 

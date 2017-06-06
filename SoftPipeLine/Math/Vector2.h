@@ -1,7 +1,7 @@
 /////////////////////////////////////////////////////////////////////////////////
 /// Copyright (C), 2017, zhangxuan. All rights reserved.
 /// \brief   二维向量
-/// \author  zhangxuan
+/// \author  xizaixuan
 /// \date    2017-06
 /////////////////////////////////////////////////////////////////////////////////
 #ifndef _Vector2_H_
@@ -36,16 +36,6 @@ public:
 
 	/// \brief 重载二元"*"运算符 与向量
 	float operator* (const Vector2& a) const;
-
-public:
-	/// \brief 置为零向量
-	void zero();
-
-	/// \brief 初始化
-	void init(float x, float y);
-
-	/// \brief 向量标准化
-	void normalize();
 
 public:
 	///	数据分量

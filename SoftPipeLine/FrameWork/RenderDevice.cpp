@@ -20,7 +20,6 @@ RenderDevice::~RenderDevice(void)
 	ReleaseDC(mHWND, mHDC);
 }
 
-
 void RenderDevice::initRenderDevice(HWND hWndMain,int WindowWidth,int WindowHeight)
 {
 	//½øÐÐ¸³Öµ
@@ -50,7 +49,6 @@ void RenderDevice::initRenderDevice(HWND hWndMain,int WindowWidth,int WindowHeig
 	mRenderBitMap = CreateDIBSection(mCDC, &bmpinfo, DIB_RGB_COLORS, (void**)&mPixelBuffer, NULL, 0);
 }
 
-
 void RenderDevice::renderBuffer()
 {
 	HGDIOBJ hOldSel = SelectObject(mCDC, mRenderBitMap);
@@ -61,12 +59,10 @@ void RenderDevice::renderBuffer()
 	SelectObject(mCDC, hOldSel);
 }
 
-
 void RenderDevice::cleanBuffer()
 {
 	memset(mPixelBuffer, 0, sizeof(DWORD)*mWindowWidth*mWindowHeight);
 }
-
 
 void RenderDevice::drawPixel(DWORD x, DWORD y, DWORD color)
 {

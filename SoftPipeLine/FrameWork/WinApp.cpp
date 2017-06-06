@@ -5,11 +5,9 @@ WinApp::WinApp(void)
 {
 }
 
-
 WinApp::~WinApp(void)
 {
 }
-
 
 void WinApp::create(HINSTANCE hInstance, int nCmdShow, int width, int height, LPSTR caption)
 {
@@ -22,24 +20,20 @@ void WinApp::create(HINSTANCE hInstance, int nCmdShow, int width, int height, LP
 	init(hInstance,nCmdShow);
 }
 
-
 int	WinApp::getWidth()
 {
 	return mWidth;
 }
-
 
 int	WinApp::getHeight()
 {
 	return mHeight;
 }
 
-
 HWND WinApp::getHwnd()
 {
 	return mHWND;
 }
-
 
 WORD WinApp::registerClass(HINSTANCE hInstance)
 {
@@ -61,7 +55,6 @@ WORD WinApp::registerClass(HINSTANCE hInstance)
 
 	return RegisterClassEx(&wcex);
 }
-
 
 bool WinApp::init(HINSTANCE hInstance, int nCmdShow)
 {
@@ -85,7 +78,6 @@ bool WinApp::init(HINSTANCE hInstance, int nCmdShow)
 
 	return true;
 }
-
 
 LRESULT CALLBACK  WinApp::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {

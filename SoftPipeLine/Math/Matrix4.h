@@ -1,11 +1,13 @@
 /////////////////////////////////////////////////////////////////////////////////
 /// Copyright (C), 2017, zhangxuan. All rights reserved.
 /// \brief   矩阵类
-/// \author  zhangxuan
+/// \author  xizaixuan
 /// \date    2017-06
 /////////////////////////////////////////////////////////////////////////////////
 #ifndef _Matrix4_H_
 #define _Matrix4_H_
+
+#include "Vector3.h"
 
 class Matrix4
 {
@@ -45,6 +47,10 @@ public:
 
 	/// \brief  计算逆矩阵
 	Matrix4 inverse();
+
+	/// \brief 设置位置信息
+	void setTranslate(float x, float y, float z);
+	void setTranslate(Vector3 pos);
 
 public:
 

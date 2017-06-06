@@ -1,28 +1,31 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="FrameWork·">
-      <UniqueIdentifier>{2e218f30-a187-453a-81d8-1a36116d15bb}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Util">
       <UniqueIdentifier>{69a8a8a3-9db2-476a-b658-43aa1f1cdf0e}</UniqueIdentifier>
     </Filter>
     <Filter Include="Math">
       <UniqueIdentifier>{1b225a1c-2439-426a-97b9-b44b47dfe07d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="RenderCore">
+      <UniqueIdentifier>{726ddb3f-0747-4ecf-ab58-0974ccca9252}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FrameWork">
+      <UniqueIdentifier>{2e218f30-a187-453a-81d8-1a36116d15bb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FrameWork\Engine.cpp">
-      <Filter>FrameWork·</Filter>
+      <Filter>FrameWork</Filter>
     </ClCompile>
     <ClCompile Include="FrameWork\Main.cpp">
-      <Filter>FrameWork·</Filter>
+      <Filter>FrameWork</Filter>
     </ClCompile>
     <ClCompile Include="FrameWork\WinApp.cpp">
-      <Filter>FrameWork·</Filter>
+      <Filter>FrameWork</Filter>
     </ClCompile>
     <ClCompile Include="FrameWork\RenderDevice.cpp">
-      <Filter>FrameWork·</Filter>
+      <Filter>FrameWork</Filter>
     </ClCompile>
     <ClCompile Include="Math\Vector2.cpp">
       <Filter>Math</Filter>
@@ -39,19 +42,22 @@
     <ClCompile Include="Math\MathUtil.cpp">
       <Filter>Math</Filter>
     </ClCompile>
+    <ClCompile Include="RenderCore\Camera.cpp">
+      <Filter>RenderCore</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FrameWork\Engine.h">
-      <Filter>FrameWork·</Filter>
+      <Filter>FrameWork</Filter>
     </ClInclude>
     <ClInclude Include="FrameWork\WinApp.h">
-      <Filter>FrameWork·</Filter>
+      <Filter>FrameWork</Filter>
     </ClInclude>
     <ClInclude Include="Util\Singleton.h">
       <Filter>Util</Filter>
     </ClInclude>
     <ClInclude Include="FrameWork\RenderDevice.h">
-      <Filter>FrameWork·</Filter>
+      <Filter>FrameWork</Filter>
     </ClInclude>
     <ClInclude Include="Math\MathUtil.h">
       <Filter>Math</Filter>
@@ -67,6 +73,9 @@
     </ClInclude>
     <ClInclude Include="Math\Matrix4.h">
       <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderCore\Camera.h">
+      <Filter>RenderCore</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
