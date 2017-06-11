@@ -68,6 +68,6 @@ void RenderDevice::drawPixel(DWORD x, DWORD y, DWORD color)
 {
 	if (x < mWindowWidth && y < mWindowHeight)
 	{
-		mPixelBuffer[x + y*mWindowWidth] = color;
+		mPixelBuffer[x + (mWindowHeight-1-y)*mWindowWidth] = color;
 	}
 }

@@ -57,7 +57,7 @@ void PipeLine::setViewPortData(float width, float height)
 
 	mViewPortMatrix.init(
 		alpha,	0,		0, 0,
-		0,		beta,	0, 0,
+		0,	   -beta,	0, 0,
 		0,		0,		1, 0,
 		alpha,	beta,	0, 1);
 }
