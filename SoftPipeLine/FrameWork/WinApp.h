@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////////
-/// Copyright (C), 2017, zhangxuan. All rights reserved.
+/// Copyright (C), 2017-2017, xizaixuan. All rights reserved.
 /// \brief   窗口管理类
 /// \author  xizaixuan
 /// \date    2017-05
@@ -14,8 +14,8 @@ class WinApp : public Singleton<WinApp>
 {
 	SINGLETON_DEFINE(WinApp)
 private:
-	WinApp(void);
-	~WinApp(void);
+	WinApp();
+	~WinApp();
 
 public:
 	/// \brief 创建窗口

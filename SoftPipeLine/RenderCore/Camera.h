@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////////
-/// Copyright (C), 2017, zhangxuan. All rights reserved.
+/// Copyright (C), 2017-2017, xizaixuan. All rights reserved.
 /// \brief   相机
 /// \author  xizaixuan
 /// \date    2017-06
@@ -29,6 +29,13 @@ public:
 
 	/// \brief 建立透视矩阵
 	void buildPerspectiveMatrix();
+
+
+	/// \brief 获取视矩阵
+	Matrix4 GetViewMatrix();
+
+	/// \brief 获取透视矩阵
+	Matrix4 GetPerspectiveMatrix();
 
 private:
 	///	视野
@@ -61,20 +68,8 @@ private:
 	///	视矩阵
 	Matrix4 mView;
 
-	///	视逆矩阵
-	Matrix4 mInvView;
-
 	///	透视矩阵
 	Matrix4 mProj;
-
-	///	透视逆矩阵
-	Matrix4 mInvProj;
-
-	///	视空间到透视空间变换矩阵
-	Matrix4 mViewProj;
-
-	///	视空间到透视空间变换逆矩阵
-	Matrix4 mInvViewProj;
 };
 
 #endif

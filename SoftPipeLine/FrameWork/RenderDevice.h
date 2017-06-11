@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////////
-/// Copyright (C), 2017, zhangxuan. All rights reserved.
+/// Copyright (C), 2017-2017, xizaixuan. All rights reserved.
 /// \brief   ªÊ÷∆¿‡
 /// \author  xizaixuan
 /// \date    2017-06

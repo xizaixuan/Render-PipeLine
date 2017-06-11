@@ -1,10 +1,8 @@
 /////////////////////////////////////////////////////////////////////////////////
-/// Copyright (C), 2017, zhangxuan. All rights reserved.
+/// Copyright (C), 2017-2017, xizaixuan. All rights reserved.
 /// \brief   单例模式基类
-/// \author  zhangxuan
-/// \version 0.1
+/// \author  xizaixuan
 /// \date    2017-05
-/// \history v0.1 2017/05/28 zhangxuan 第一次添加Singleton
 /////////////////////////////////////////////////////////////////////////////////
 
 #ifndef Singleton_H_

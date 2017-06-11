@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////////
-/// Copyright (C), 2017, zhangxuan. All rights reserved.
+/// Copyright (C), 2017-2017, xizaixuan. All rights reserved.
 /// \brief   N维向量，向量的基类
 /// \author  xizaixuan
 /// \date    2017-05
@@ -10,12 +10,14 @@
 #include <Windows.h>
 #include "../Util/Singleton.h"
 
+class Camera;
+
 class Engine : public Singleton<Engine>
 {
 	SINGLETON_DEFINE(Engine)
 private:
-	Engine(void);
-	~Engine(void);
+	Engine();
+	~Engine();
 
 public:
 	/// \brief 初始化
@@ -26,6 +28,14 @@ public:
 
 	/// \brief 更新
 	void update(float dt);
+
+private:
+	/// \brief 相机数据更新
+	void updateCamera(float dt);
+
+private:
+	/// \brief 主相机
+	Camera* mCamera;
 };
 
 

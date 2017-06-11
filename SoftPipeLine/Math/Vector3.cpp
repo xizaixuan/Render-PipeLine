@@ -2,11 +2,6 @@
 
 #include "MathUtil.h"
 
-
-Vector3::Vector3()
-{
-}
-
 Vector3::Vector3(float tx, float ty, float tz)
 	: x(tx)
 	, y(ty)

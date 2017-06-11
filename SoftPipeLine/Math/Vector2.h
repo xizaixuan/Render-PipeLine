@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////////
-/// Copyright (C), 2017, zhangxuan. All rights reserved.
+/// Copyright (C), 2017-2017, xizaixuan. All rights reserved.
 /// \brief   二维向量
 /// \author  xizaixuan
 /// \date    2017-06
@@ -10,9 +10,6 @@
 class Vector2
 {
 public:
-	/// \brief 默认构造函数
-	Vector2();
-
 	/// \brief 参数构造函数
 	Vector2(float x, float y);
 

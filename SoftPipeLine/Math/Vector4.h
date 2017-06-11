@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////////
-/// Copyright (C), 2017, zhangxuan. All rights reserved.
+/// Copyright (C), 2017-2017, xizaixuan. All rights reserved.
 /// \brief   四维向量
 /// \author  xizaixuan
 /// \date    2017-06
@@ -13,9 +13,6 @@ class Matrix4;
 class Vector4
 {
 public:
-	/// \brief 默认构造函数
-	Vector4();
-
 	/// \brief 参数构造函数
 	Vector4(float x, float y, float z);
 

@@ -1,11 +1,11 @@
 #include "WinApp.h"
 
 
-WinApp::WinApp(void)
+WinApp::WinApp()
 {
 }
 
-WinApp::~WinApp(void)
+WinApp::~WinApp()
 {
 }
 

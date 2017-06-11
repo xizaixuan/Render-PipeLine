@@ -12,11 +12,7 @@ Camera::Camera()
 	, mRight(0.0f, 0.0f, 0.0f)
 {
 	mView.identity();
-	mInvView.identity();
 	mProj.identity();
-	mInvProj.identity();
-	mViewProj.identity();
-	mInvViewProj.identity();
 }
 
 Camera::~Camera()
@@ -25,7 +21,7 @@ Camera::~Camera()
 
 void Camera::update(float lfov, float laspect, float lznear, float lzfar)
 {
-	mFov		= lfov;
+	mFov	= lfov;
 	mAspect	= laspect;
 	mZNear	= lznear;
 	mZFar	= lzfar;
@@ -39,9 +35,6 @@ void Camera::update(Vector3 position, Vector3 target)
 	buildViewMatrix();
 
 	buildPerspectiveMatrix();
-
-	mViewProj = mView*mProj;
-	mInvViewProj = mViewProj.inverse();
 }
 
 void Camera::buildViewMatrix()
@@ -62,8 +55,8 @@ void Camera::buildViewMatrix()
 		mForward.x,	mForward.y,	mForward.z,	0.0f,
 		0.0f,		0.0f,		0.0f,		1.0f);
 
-	mInvView = matR*matT;
-	mView = matT.inverse();
+	Matrix4 invView = matR*matT;
+	mView = invView.inverse();
 }
 
 void Camera::buildPerspectiveMatrix()
@@ -73,16 +66,24 @@ void Camera::buildPerspectiveMatrix()
 
 	float cotFov2 = 1.0f / (tan(AngelToRadian(mFov / 2.0f)));
 	float W = 2.0f * N / cotFov2;
-	float H = W*mAspect;
+	float H = W/mAspect;
 
 	float a = F / (F - N);
 	float b = -N*F / (F - N);
 
 	mProj.init(
-		2.0f*N/W,	0,			0,	0,
-		0,			2.0f*N/H,	0,	0,
-		0,			0,			a,	1.0f,
-		0,			0,			-b,	0);
+		2.0f*N/W,	0.0f,		0.0f,	0.0f,
+		0.0f,		2.0f*N/H,	0.0f,	0.0f,
+		0.0f,		0.0f,		a,		1.0f,
+		0.0f,		0.0f,	   -b,		0.0f);
+}
 
-	mInvProj = mProj.inverse();
+Matrix4 Camera::GetViewMatrix()
+{
+	return mView;
+}
+
+Matrix4 Camera::GetPerspectiveMatrix()
+{
+	return mProj;
 }

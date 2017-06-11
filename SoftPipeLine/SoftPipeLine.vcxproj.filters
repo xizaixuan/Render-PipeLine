@@ -45,6 +45,12 @@
     <ClCompile Include="RenderCore\Camera.cpp">
       <Filter>RenderCore</Filter>
     </ClCompile>
+    <ClCompile Include="RenderCore\PipeLine.cpp">
+      <Filter>RenderCore</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderCore\RenderFace.cpp">
+      <Filter>RenderCore</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FrameWork\Engine.h">
@@ -75,6 +81,12 @@
       <Filter>Math</Filter>
     </ClInclude>
     <ClInclude Include="RenderCore\Camera.h">
+      <Filter>RenderCore</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderCore\PipeLine.h">
+      <Filter>RenderCore</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderCore\RenderFace.h">
       <Filter>RenderCore</Filter>
     </ClInclude>
   </ItemGroup>

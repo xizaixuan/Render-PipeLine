@@ -29,6 +29,8 @@
     <ClCompile Include="Math\Vector3.cpp" />
     <ClCompile Include="Math\Vector4.cpp" />
     <ClCompile Include="RenderCore\Camera.cpp" />
+    <ClCompile Include="RenderCore\PipeLine.cpp" />
+    <ClCompile Include="RenderCore\RenderFace.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FrameWork\Engine.h" />
@@ -40,6 +42,8 @@
     <ClInclude Include="Math\Vector3.h" />
     <ClInclude Include="Math\Vector4.h" />
     <ClInclude Include="RenderCore\Camera.h" />
+    <ClInclude Include="RenderCore\PipeLine.h" />
+    <ClInclude Include="RenderCore\RenderFace.h" />
     <ClInclude Include="Util\Singleton.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

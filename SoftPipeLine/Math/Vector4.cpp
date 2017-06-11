@@ -2,13 +2,6 @@
 
 #include "MathUtil.h"
 
-#include "Vector3.h"
-#include "Matrix4.h"
-
-Vector4::Vector4()
-{
-}
-
 Vector4::Vector4(float tx, float ty, float tz)
 	: x(tx)
 	, y(ty)
@@ -68,26 +61,21 @@ float Vector4::operator *(const Vector4& a) const
 
 Vector4 Vector4::operator *(const Matrix4& a) const
 {
-	Vector4 result;
-	for (int col=0; col < 4; col++)
-	{
-		float sum = 0; 
+	Vector4 result(0.0f, 0.0f, 0.0f, 0.0f);
 
-		for (int row=0; row<4; row++)
-		{
-			sum+=(M[row]*a.M[row][col]);
-		} 
-
-		result.M[col] = sum;
-	} 
+	result.x = x * a.M[0][0] + y * a.M[1][0] + z * a.M[2][0] + w * a.M[3][0];
+	result.y = x * a.M[0][1] + y * a.M[1][1] + z * a.M[2][1] + w * a.M[3][1];
+	result.z = x * a.M[0][2] + y * a.M[1][2] + z * a.M[2][2] + w * a.M[3][2];
+	result.w = x * a.M[0][3] + y * a.M[1][3] + z * a.M[2][3] + w * a.M[3][3];
 
 	return result;
+
 }
 
 void Vector4::homogenous()
 {
-	this->x/=w;
-	this->y/=w;
-	this->z/=w;
-	this->w/=w;
+	this->x /= w;
+	this->y /= w;
+	this->z /= w;
+	this->w /= w;
 }

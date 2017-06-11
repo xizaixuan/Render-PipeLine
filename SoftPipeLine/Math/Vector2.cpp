@@ -1,10 +1,6 @@
 #include "Vector2.h"
 #include "MathUtil.h"
 
-Vector2::Vector2()
-{
-}
-
 Vector2::Vector2(float tx, float ty)
 	:x(tx)
 	,y(ty)
