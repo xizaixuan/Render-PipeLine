@@ -13,6 +13,9 @@ class Matrix4;
 class Vector4
 {
 public:
+	/// \brief 构造函数
+	Vector4();
+
 	/// \brief 参数构造函数
 	Vector4(float x, float y, float z);
 

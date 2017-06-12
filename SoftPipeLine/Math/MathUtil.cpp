@@ -110,3 +110,8 @@ T Zero(T& v)
 		m = 0.0f;
 	}
 }
+
+bool isEqual(float a, float b)
+{
+	return (fabs(a - b) < epsilon_e3);
+}

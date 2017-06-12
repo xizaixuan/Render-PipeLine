@@ -36,6 +36,18 @@ public:
 	/// \brief 绘制线段
 	void drawLine(Vector4 ver0, Vector4 ver1);
 
+	/// \brief 分裂不规则三角形
+	void splitTriangle(RenderFace* triOne, RenderFace* triTwo);
+
+	/// \brief 光栅三角形
+	void rasterizeFace(RenderFace* renderFace);
+
+	/// \brief 光栅平顶三角形
+	void rasterizeTopFace(RenderFace* renderFace);
+
+	/// \brief 光栅平底三角形
+	void rasterizeBottomFace(RenderFace* renderFace);
+
 private:
 
 	/// 视窗宽

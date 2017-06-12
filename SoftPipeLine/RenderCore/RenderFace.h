@@ -15,11 +15,14 @@ public:
 	/// \brief 构造函数
 	RenderFace();
 
+	/// \brief 复制构造函数
+	RenderFace(const RenderFace& face);
+
 	/// \brief 析构函数
 	~RenderFace();
 
 public:
-	/// \brief 面片的三个顶点
+	/// 面片的三个顶点
 	Vector4 v0;
 	Vector4 v1;
 	Vector4 v2;

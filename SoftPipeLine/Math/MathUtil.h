@@ -13,6 +13,7 @@
 #include "Vector4.h"
 #include "Matrix4.h"
 
+const float epsilon_e3 = (float)(1E-1);
 const float epsilon_e4 = (float)(1E-4);
 const float epsilon_e5 = (float)(1E-5);
 const float epsilon_e6 = (float)(1E-6);
@@ -42,4 +43,6 @@ Vector4 Cross(const Vector4& a, const Vector4& b);
 template<typename T>
 T Zero(T& v);
 
+/// brief 比较两个浮点数是否相等
+bool isEqual(float a, float b);
 #endif
