@@ -26,6 +26,10 @@ public:
 	Vector4 v0;
 	Vector4 v1;
 	Vector4 v2;
+
+	Vector2 uv0;
+	Vector2 uv1;
+	Vector2 uv2;
 };
 
 #endif

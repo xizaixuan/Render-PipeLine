@@ -10,6 +10,9 @@
 class Vector2
 {
 public:
+	/// \brief 构造函数
+	Vector2();
+
 	/// \brief 参数构造函数
 	Vector2(float x, float y);
 

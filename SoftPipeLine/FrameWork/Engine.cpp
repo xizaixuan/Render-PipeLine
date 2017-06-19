@@ -5,6 +5,8 @@
 #include "..\RenderCore\RenderFace.h"
 #include "..\RenderCore\PipeLine.h"
 #include "..\Math\MathUtil.h"
+#include "..\RenderCore\Texture.h"
+#include "..\RenderCore\RenderUtil.h"
 
 Engine::Engine()
 	: mCamera(nullptr)
@@ -20,6 +22,7 @@ Engine::~Engine()
 	}
 }
 
+Texture* texture = nullptr;
 void Engine::init(HINSTANCE hInstance, int nCmdShow)
 {
 	WinApp::getSingletonPtr()->create(hInstance, nCmdShow, 1024, 768, "SoftPipeLine");
@@ -47,6 +50,13 @@ void Engine::init(HINSTANCE hInstance, int nCmdShow)
 	};
 
 	int k[36] = {0};
+	Vector2 UV[36] = { Vector2(0.0f, 0.0f) };
+
+	for (int i=0;i<36;i+=6)
+	{
+		UV[i] = Vector2(0.0f, 1.0f);  UV[i+1] = Vector2(0.0f, 0.0f); UV[i+2] = Vector2(1.0f, 0.0f);
+		UV[i+3] = Vector2(0.0f, 1.0f);  UV[i+4] = Vector2(1.0f, 0.0f); UV[i+5] = Vector2(1.0f, 1.0f);
+	}
 
 	// Front face.
 	k[0] = 0; k[1] = 1; k[2] = 2;
@@ -79,8 +89,14 @@ void Engine::init(HINSTANCE hInstance, int nCmdShow)
 		face.v1 = cubeVertexArray[k[i+1]];
 		face.v2 = cubeVertexArray[k[i+2]];
 
+		face.uv0 = UV[i];
+		face.uv1 = UV[i+1];
+		face.uv2 = UV[i+2];
+
 		PipeLine::getSingletonPtr()->addToRenderList(face);
 	}
+
+	texture = LoadTextureFromPNG("Texture/BoxTexture.bmp");
 }
 
 void Engine::destroy()
