@@ -75,7 +75,7 @@ void Camera::buildPerspectiveMatrix()
 		2.0f*N/W,	0.0f,		0.0f,	0.0f,
 		0.0f,		2.0f*N/H,	0.0f,	0.0f,
 		0.0f,		0.0f,		a,		1.0f,
-		0.0f,		0.0f,	   -b,		0.0f);
+		0.0f,		0.0f,	    b,		0.0f);
 }
 
 Matrix4 Camera::GetViewMatrix()

@@ -9,6 +9,7 @@ RenderDevice::RenderDevice(void)
 	, mCDC(nullptr)
 	, mRenderBitMap(nullptr)
 	, mHWND(nullptr)
+	, mZBuffer(nullptr)
 {
 }
 
@@ -18,6 +19,12 @@ RenderDevice::~RenderDevice(void)
 
 	DeleteDC(mCDC);
 	ReleaseDC(mHWND, mHDC);
+
+	if (mZBuffer != nullptr)
+	{
+		delete[] mZBuffer;
+		mZBuffer = nullptr;
+	}
 }
 
 void RenderDevice::initRenderDevice(HWND hWndMain,int WindowWidth,int WindowHeight)
@@ -47,6 +54,8 @@ void RenderDevice::initRenderDevice(HWND hWndMain,int WindowWidth,int WindowHeig
 
 	// 申请内存, 无需手动释放
 	mRenderBitMap = CreateDIBSection(mCDC, &bmpinfo, DIB_RGB_COLORS, (void**)&mPixelBuffer, NULL, 0);
+
+	mZBuffer = new float[WindowWidth*WindowHeight];
 }
 
 void RenderDevice::renderBuffer()
@@ -61,7 +70,9 @@ void RenderDevice::renderBuffer()
 
 void RenderDevice::cleanBuffer()
 {
-	memset(mPixelBuffer, 0, sizeof(DWORD)*mWindowWidth*mWindowHeight);
+	memset(mPixelBuffer, 0x00, sizeof(DWORD)*mWindowWidth*mWindowHeight);
+
+	memset(mZBuffer, 0x7f, sizeof(float)*mWindowWidth*mWindowHeight);
 }
 
 void RenderDevice::drawPixel(DWORD x, DWORD y, DWORD color)
@@ -69,5 +80,18 @@ void RenderDevice::drawPixel(DWORD x, DWORD y, DWORD color)
 	if (x < mWindowWidth && y < mWindowHeight)
 	{
 		mPixelBuffer[x + (mWindowHeight-1-y)*mWindowWidth] = color;
+	}
+}
+
+void RenderDevice::drawPixel(DWORD x, DWORD y, DWORD color, float depth)
+{
+	if (x < mWindowWidth && y < mWindowHeight)
+	{
+		int index = x + (mWindowHeight - 1 - y)*mWindowWidth;
+		if (depth < mZBuffer[index])
+		{
+			mPixelBuffer[index] = color;
+			mZBuffer[index] = depth;
+		}
 	}
 }

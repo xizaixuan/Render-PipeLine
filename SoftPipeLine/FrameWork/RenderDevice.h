@@ -30,9 +30,13 @@ public:
 	/// \brief 绘制color
 	void drawPixel(DWORD x, DWORD y, DWORD color);
 
+	/// \brief 绘制color
+	void drawPixel(DWORD x, DWORD y, DWORD color, float depth);
+
 private:
 	///	像素Buffer
 	DWORD*	mPixelBuffer;
+	float*	mZBuffer;
 
 	///	窗口宽度
 	DWORD	mWindowWidth;
@@ -51,8 +55,6 @@ private:
 
 	///	窗口句柄
 	HWND	mHWND;
-
 };
-
 
 #endif

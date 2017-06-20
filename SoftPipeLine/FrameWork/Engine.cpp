@@ -33,7 +33,7 @@ void Engine::init(HINSTANCE hInstance, int nCmdShow)
 
 	mCamera = new Camera();
 
-	mCamera->update(60, 1024.0f/768.0f, 0.1f, 1000.0f);
+	mCamera->update(60, 1024.0f/768.0f, 1.0f, 100.0f);
 
 
 	//////////////////////////////////////////////////////////////////////////

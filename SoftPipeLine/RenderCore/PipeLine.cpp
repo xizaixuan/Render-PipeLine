@@ -115,29 +115,35 @@ void PipeLine::splitTriangle(RenderFace* triOne, RenderFace* triTwo)
 	float y0 = triOne->v0.y;
 	float y1 = triOne->v1.y;
 	float y2 = triOne->v2.y;
+	float z0 = triOne->v0.z;
+	float z1 = triOne->v1.z;
+	float z2 = triOne->v2.z;
 
 	Vector2 uv0 = triOne->uv0;
 	Vector2 uv1 = triOne->uv1;
 	Vector2 uv2 = triOne->uv2;
 
-	// dx(new-0)/dx(2-0) = dy(1-0)/dy(2-0) => newX = 0 + dy(1-0)/dy(2-0)*dx(2-0)
+	
 	float dy1_0 = y1 - y0;
 	float dy2_0 = y2 - y0;
 	float dx2_0 = x2 - x0;
-	
-	// 计算分割点坐标
-	float newX = x0 + (dy1_0/dy2_0)*dx2_0;
-
-	// duv(new-0)/duv(2-0) = dy(1-0)/dy(2-0) => new = 0 + duv(2-0)*dy(1-0)/dy(2-0)
+	float dz2_0 = z2 - z0;
 	Vector2 duv2_0 = (uv2 - uv0);
 
+	// dx(new-0)/dx(2-0) = dy(1-0)/dy(2-0) => newX = 0 + dy(1-0)/dy(2-0)*dx(2-0)
+	float newX = x0 + (dy1_0 / dy2_0)*dx2_0;
+
+	// dz(new-0)/dz(2-0) = dy(1-0)/dy(2-0) => newX = 0 + dy(1-0)/dy(2-0)*dz(2-0)
+	float newZ = z0 + (dy1_0 / dy2_0)*dz2_0;
+
+	// duv(new-0)/duv(2-0) = dy(1-0)/dy(2-0) => new = 0 + duv(2-0)*dy(1-0)/dy(2-0)
 	Vector2 newUV = uv0 + duv2_0*(dy1_0 / dy2_0);
 
 	//////////////////////////////////////////////////////////////////////////
 	// 平底三角形
-	triOne->v0 = Vector4(x0,	y0, 0.0f, 1);
-	triOne->v1 = Vector4(newX,	y1, 0.0f, 1);
-	triOne->v2 = Vector4(x1,	y1, 0.0f, 1);
+	triOne->v0 = Vector4(x0,	y0, z0, 1);
+	triOne->v1 = Vector4(newX,	y1, newZ, 1);
+	triOne->v2 = Vector4(x1,	y1, z1, 1);
 
 	triOne->uv0 = uv0;
 	triOne->uv1 = newUV;
@@ -145,9 +151,9 @@ void PipeLine::splitTriangle(RenderFace* triOne, RenderFace* triTwo)
 
 	//////////////////////////////////////////////////////////////////////////
 	// 平顶三角形
-	triTwo->v0 = Vector4(x1,	y1, 0.0f, 1);
-	triTwo->v1 = Vector4(newX,	y1, 0.0f, 1);
-	triTwo->v2 = Vector4(x2,	y2, 0.0f, 1);
+	triTwo->v0 = Vector4(x1,	y1, z1, 1);
+	triTwo->v1 = Vector4(newX,	y1, newZ, 1);
+	triTwo->v2 = Vector4(x2,	y2, z2, 1);
 
 	triTwo->uv0 = uv1;
 	triTwo->uv1 = newUV;
@@ -232,12 +238,15 @@ void PipeLine::rasterizeTopFace(RenderFace* renderFace)
 {
 	float x0 = renderFace->v0.x;
 	float y0 = renderFace->v0.y;
+	float z0 = renderFace->v0.z;
 
 	float x1 = renderFace->v1.x;
 	float y1 = renderFace->v1.y;
+	float z1 = renderFace->v1.z;
 
 	float x2 = renderFace->v2.x;
 	float y2 = renderFace->v2.y;
+	float z2 = renderFace->v2.z;
 
 	// 检测三角形是否退出为直线
 	if (((x0 == x1) && (x1 == x2)) || ((y0 == y1) && (y1 == y2)))
@@ -248,11 +257,17 @@ void PipeLine::rasterizeTopFace(RenderFace* renderFace)
 
 	float inv_dy = 1.0f / dy;
 
-	// 计算左斜边斜率
+	// 计算左斜边x积分
 	float dxdyl = (x2 - x0) * inv_dy;
 
-	// 计算右斜边斜率
+	// 计算右斜边x积分
 	float dxdyr = (x2 - x1) * inv_dy;
+
+	// 计算左斜边z积分
+	float dzdyl = (z2 - z0) * inv_dy;
+
+	// 计算右斜边z积分
+	float dzdyr = (z2 - z1) * inv_dy;
 
 	// 计算左斜边uv积分
 	Vector2 duvdyl = (renderFace->uv2 - renderFace->uv0) * inv_dy;
@@ -268,6 +283,10 @@ void PipeLine::rasterizeTopFace(RenderFace* renderFace)
 	float ystart = y0;
 	float yend = y2;
 
+	// 设置扫描线起始z及终点z
+	float zstart = z0;
+	float zend = z1;
+
 	// 设置扫描线uv起始点及终点
 	Vector2 uvstart = renderFace->uv0;
 	Vector2 uvend = renderFace->uv1;
@@ -276,8 +295,11 @@ void PipeLine::rasterizeTopFace(RenderFace* renderFace)
 	{
 		float inv_dx = 1.0f / (xend - xstart);
 		Vector2 duv = (uvend - uvstart) * inv_dx;
+		float dz = (zend - zstart) * inv_dx;
 
 		Vector2 uv = uvstart;
+
+		float z = zstart;
 
 		// 绘制扫描线
 		for (float xi = xstart; xi < xend; xi++)
@@ -286,9 +308,10 @@ void PipeLine::rasterizeTopFace(RenderFace* renderFace)
 
 			DWORD color = texture->getPixel(uv.x, uv.y);
 			// 绘制像素点
-			RenderDevice::getSingletonPtr()->drawPixel((int)xi, (int)yi, color);
+			RenderDevice::getSingletonPtr()->drawPixel((int)xi, (int)yi, color, z);
 
 			uv = uv + duv;
+			z = z + dz;
 		}
 
 		//计算下一条扫描线起点及终点
@@ -297,6 +320,9 @@ void PipeLine::rasterizeTopFace(RenderFace* renderFace)
 
 		uvstart = uvstart + duvdyl;
 		uvend = uvend + duvdyr;
+
+		zstart = zstart + dzdyl;
+		zend = zend + dzdyr;
 	}
 }
 
@@ -304,12 +330,15 @@ void PipeLine::rasterizeBottomFace(RenderFace* renderFace)
 {
 	float x0 = renderFace->v0.x;
 	float y0 = renderFace->v0.y;
+	float z0 = renderFace->v0.z;
 
 	float x1 = renderFace->v1.x;
 	float y1 = renderFace->v1.y;
+	float z1 = renderFace->v1.z;
 
 	float x2 = renderFace->v2.x;
 	float y2 = renderFace->v2.y;
+	float z2 = renderFace->v2.z;
 
 	// 检测三角形是否退出为直线
 	if (((x0 == x1) && (x1 == x2)) || ((y0 == y1) && (y1 == y2)))
@@ -320,11 +349,17 @@ void PipeLine::rasterizeBottomFace(RenderFace* renderFace)
 
 	float inv_dy = 1.0f / dy;
 
-	// 计算左斜边斜率
+	// 计算左斜边x积分
 	float dxdyl = (x1 - x0) * inv_dy;
 
-	// 计算右斜边斜率
+	// 计算右斜边x积分
 	float dxdyr = (x2 - x0) * inv_dy;
+
+	// 计算左斜边z积分
+	float dzdyl = (z1 - z0) * inv_dy;
+
+	// 计算右斜边z积分
+	float dzdyr = (z2 - z0) * inv_dy;
 
 	// 计算左斜边uv积分
 	Vector2 duvdyl = (renderFace->uv1 - renderFace->uv0) * inv_dy;
@@ -340,6 +375,10 @@ void PipeLine::rasterizeBottomFace(RenderFace* renderFace)
 	float ystart = y0;
 	float yend = y2;
 
+	// 设置扫描线起始y及终点y
+	float zstart = z0;
+	float zend = z0;
+
 	// 设置扫描线uv起始点及终点
 	Vector2 uvstart = renderFace->uv0;
 	Vector2 uvend = renderFace->uv0;
@@ -348,8 +387,11 @@ void PipeLine::rasterizeBottomFace(RenderFace* renderFace)
 	{
 		float inv_dx = 1.0f / (xend - xstart);
 		Vector2 duv = (uvend - uvstart) * inv_dx;
+		float dz = (zend - zstart) * inv_dx;
 
 		Vector2 uv = uvstart;
+
+		float z = zstart;
 
 		// 绘制扫描线
 		for (float xi = xstart; xi < xend; xi++)
@@ -358,9 +400,11 @@ void PipeLine::rasterizeBottomFace(RenderFace* renderFace)
 
 			DWORD color = texture->getPixel(uv.x, uv.y);
 			// 绘制像素点
-			RenderDevice::getSingletonPtr()->drawPixel((int)xi, (int)yi, color);
+			RenderDevice::getSingletonPtr()->drawPixel((int)xi, (int)yi, color, z);
 
 			uv = uv + duv;
+
+			z = z + dz;
 		}
 
 		//计算下一条扫描线起点及终点
@@ -369,5 +413,8 @@ void PipeLine::rasterizeBottomFace(RenderFace* renderFace)
 
 		uvstart = uvstart + duvdyl;
 		uvend = uvend + duvdyr;
+
+		zstart = zstart + dzdyl;
+		zend = zend + dzdyr;
 	}
 }

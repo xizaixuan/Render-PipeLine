@@ -8,3 +8,4 @@ build a 3D pipeline on cpu
 2. 线框渲染(wireframe: DDA)
 3. 光栅化(scan conversion)
 4. 纹理映射(interpolation)
+5. ZBuffer(simple Z)
