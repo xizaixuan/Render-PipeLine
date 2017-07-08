@@ -11,6 +11,7 @@
 #include "../Util/Singleton.h"
 #include <vector>
 #include "RenderFace.h"
+#include <windows.h>
 
 class Camera;
 
@@ -34,7 +35,7 @@ public:
 	void setViewPortData(float width, float height);
 
 	/// \brief 绘制线段
-	void drawLine(Vector4 ver0, Vector4 ver1);
+	void drawLine(Vector4 ver0, Vector4 ver1, DWORD color);
 
 	/// \brief 分裂不规则三角形
 	void splitTriangle(RenderFace* triOne, RenderFace* triTwo);
@@ -47,6 +48,9 @@ public:
 
 	/// \brief 光栅平底三角形
 	void rasterizeBottomFace(RenderFace* renderFace);
+
+	/// \brief 裁剪
+	void clipFace(Camera* camera);
 
 private:
 
@@ -61,6 +65,8 @@ private:
 
 	/// 渲染列表
 	std::vector<RenderFace> mRenderFaceList;
+	std::vector<RenderFace> mRenderFace2List;
+	std::vector<RenderFace> mRasterizeList;
 };
 
 #endif

@@ -40,7 +40,15 @@ void Camera::update(Vector3 position, Vector3 target)
 void Camera::buildViewMatrix()
 {
 	// Transform Mat = (MatR * MatT)-1
-	mForward = Normalize(mTarget - mPosition);
+	Vector3 dir = mTarget - mPosition;
+
+	if (Length(dir) <= epsilon_e3 && Length(dir) >= -epsilon_e3)
+	{
+	}
+	else
+	{
+		mForward = Normalize(mTarget - mPosition);
+	}
 
 	mRight = Normalize(Cross(Vector3(0,1,0), mForward));
 	mUp = Normalize(Cross(mForward, mRight));

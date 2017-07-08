@@ -7,6 +7,7 @@ RenderFace::RenderFace()
 	, uv0(0.0f, 0.0f)
 	, uv1(0.0f, 0.0f)
 	, uv2(0.0f, 0.0f)
+	, color(0)
 {
 }
 
@@ -19,6 +20,8 @@ RenderFace::RenderFace(const RenderFace& face)
 	uv0 = face.uv0;
 	uv1 = face.uv1;
 	uv2 = face.uv2;
+
+	color = face.color;
 }
 
 RenderFace::~RenderFace()

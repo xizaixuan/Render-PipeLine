@@ -33,7 +33,7 @@ void Engine::init(HINSTANCE hInstance, int nCmdShow)
 
 	mCamera = new Camera();
 
-	mCamera->update(60, 1024.0f/768.0f, 1.0f, 100.0f);
+	mCamera->update(60, 1024.0f/768.0f, 0.1f, 1000.0f);
 
 
 	//////////////////////////////////////////////////////////////////////////
@@ -148,6 +148,34 @@ void Engine::updateCamera(float dt)
 
 	position.x = radius*cosf(theta);
 	position.z = radius*sinf(theta);
+
+	static Vector2 pos(0.0f, 0.0f);
+
+	if (GetKeyState(VK_UP) & 0x8000)
+	{
+		pos.x -= 0.000001;
+	}
+
+	if (GetKeyState(VK_DOWN) & 0x8000)
+	{
+		pos.x += 0.000001;
+	}
+
+	if (GetKeyState(VK_LEFT) & 0x8000)
+	{
+		pos.y -= 0.000001;
+	}
+
+	if (GetKeyState(VK_RIGHT) & 0x8000)
+	{
+		pos.y += 0.000001;
+	}
+
+	position.x += pos.x;
+	position.z += pos.y;
+
+	target.x += pos.x;
+	target.z += pos.y;
 
 	mCamera->update(position, target);
 }

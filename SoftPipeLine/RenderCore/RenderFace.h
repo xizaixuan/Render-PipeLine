@@ -23,13 +23,23 @@ public:
 
 public:
 	/// 面片的三个顶点
-	Vector4 v0;
-	Vector4 v1;
-	Vector4 v2;
+	union 
+	{
+		Vector4 vertex[3];
+		struct 
+		{
+			Vector4 v0;
+			Vector4 v1;
+			Vector4 v2;
+		};
+	};
+	
 
 	Vector2 uv0;
 	Vector2 uv1;
 	Vector2 uv2;
+
+	int color;
 };
 
 #endif

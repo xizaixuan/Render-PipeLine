@@ -59,7 +59,7 @@ Vector4 Vector4::operator -(const Vector4& a) const
 
 Vector4 Vector4::operator *(float a) const
 {
-	return Vector4( x*a, y*a, z*a );
+	return Vector4( x*a, y*a, z*a, w*a);
 }
 
 float Vector4::operator *(const Vector4& a) const

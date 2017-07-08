@@ -37,7 +37,7 @@ public:
 	/// \brief 获取透视矩阵
 	Matrix4 GetPerspectiveMatrix();
 
-private:
+	public:
 	///	视野
 	float mFov;
 

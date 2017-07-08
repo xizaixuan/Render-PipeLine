@@ -25,6 +25,9 @@ void PipeLine::execute(Camera* camera)
 	Matrix4 projMat = camera->GetPerspectiveMatrix();
 	Matrix4 vp = viewMat*projMat;
 
+	mRasterizeList.clear();
+	mRenderFace2List.clear();
+
 	for (auto face:mRenderFaceList)
 	{
 		RenderFace newFace(face);
@@ -32,26 +35,40 @@ void PipeLine::execute(Camera* camera)
 		newFace.v1 = face.v1*vp;
 		newFace.v2 = face.v2*vp;
 
+		mRenderFace2List.push_back(newFace);
+	}
+
+	clipFace(camera);
+
+	for (auto& face: mRasterizeList)
+	{
 		// 透视除法
-		newFace.v0.homogenous();
-		newFace.v1.homogenous();
-		newFace.v2.homogenous();
+		face.v0.homogenous();
+		face.v1.homogenous();
+		face.v2.homogenous();
 
 		// 视口转换
-		newFace.v0 = newFace.v0*mViewPortMatrix;
-		newFace.v1 = newFace.v1*mViewPortMatrix;
-		newFace.v2 = newFace.v2*mViewPortMatrix;
+		face.v0 = face.v0*mViewPortMatrix;
+		face.v1 = face.v1*mViewPortMatrix;
+		face.v2 = face.v2*mViewPortMatrix;
 
-		Vector4 v0 = newFace.v0;
-		Vector4 v1 = newFace.v1;
-		Vector4 v2 = newFace.v2;
+		Vector4 v0 = face.v0;
+		Vector4 v1 = face.v1;
+		Vector4 v2 = face.v2;
 
 		// 光栅化三角形
-		rasterizeFace(&newFace);
+//		rasterizeFace(&face);
 
-// 		drawLine(v0, v1);
-// 		drawLine(v0, v2);
-// 		drawLine(v1, v2);
+		DWORD color = RGB(255, 255, 255);
+
+		if (face.color == 1)
+		{
+			color = RGB(0, 255, 255);
+		}
+
+ 		drawLine(v0, v1, color);
+		drawLine(v0, v2, color);
+ 		drawLine(v1, v2, color);
 	}
 }
 
@@ -70,7 +87,7 @@ void PipeLine::setViewPortData(float width, float height)
 		alpha,	beta,	0, 1);
 }
 
-void PipeLine::drawLine(Vector4 ver0, Vector4 ver1)
+void PipeLine::drawLine(Vector4 ver0, Vector4 ver1, DWORD color)
 {
 	int x0 = ver0.x;
 	int y0 = ver0.y;
@@ -99,7 +116,7 @@ void PipeLine::drawLine(Vector4 ver0, Vector4 ver1)
 	for (int i = 1; i <= steps; i++)
 	{
 		// 绘制像素点
-		RenderDevice::getSingletonPtr()->drawPixel((int)xi, (int)yi, RGB(255, 255, 255));
+		RenderDevice::getSingletonPtr()->drawPixel((int)xi, (int)yi, color);
 
 		xi += increx;
 		yi += increy;
@@ -416,5 +433,179 @@ void PipeLine::rasterizeBottomFace(RenderFace* renderFace)
 
 		zstart = zstart + dzdyl;
 		zend = zend + dzdyr;
+	}
+}
+
+// 快速线性插值
+template<class T>
+inline T SrFastLerp(const T& a, const T& b, float ratio, float inv_ratio)
+{
+	return (a * inv_ratio + b * ratio);
+}
+
+
+void PipeLine::clipFace(Camera* camera)
+{
+	// 内部裁剪码
+	const int CLIP_CODE_GZ = 0x0001;    // z > 1
+	const int CLIP_CODE_LZ = 0x0002;    // z < 0
+	const int CLIP_CODE_IZ = 0x0004;    // 0 < z < 1
+
+	const int CLIP_CODE_GX = 0x0001;    // x > 1
+	const int CLIP_CODE_LX = 0x0002;    // x < -1
+	const int CLIP_CODE_IX = 0x0004;    // 1 < x < -1
+
+	const int CLIP_CODE_GY = 0x0001;    // y > 1
+	const int CLIP_CODE_LY = 0x0002;    // y < -1
+	const int CLIP_CODE_IY = 0x0004;    // -1 < y < 1
+
+	for (auto& face : mRenderFace2List)
+	{
+		// 用于存储裁剪标记
+		int vertexCode[3]; 
+
+		int vertexCountInView = 0;
+
+		// 根据远近裁剪面进行剔除
+		for (int i = 0; i < 3; i++)
+		{
+			auto& vertex = face.vertex[i];
+
+			if (vertex.w>=0)
+			{
+				if (vertex.z > vertex.w)
+				{
+					vertexCode[i] = CLIP_CODE_GZ;
+				}
+				else if (vertex.z < 0.0f)
+				{
+					vertexCode[i] = CLIP_CODE_LZ;
+				}
+				else
+				{
+					vertexCountInView++;
+					vertexCode[i] = CLIP_CODE_IZ;
+				}
+			}
+			else
+			{
+				if (vertex.z < vertex.w)
+				{
+					vertexCode[i] = CLIP_CODE_GZ;
+				}
+				else if (vertex.z > 0.0f)
+				{
+					vertexCode[i] = CLIP_CODE_LZ;
+				}
+				else
+				{
+					vertexCountInView++;
+					vertexCode[i] = CLIP_CODE_IZ;
+				}
+			}
+		}
+
+		// 测试是否完全在远近裁剪面外
+		if ((vertexCode[0] == CLIP_CODE_GZ) &&
+			(vertexCode[1] == CLIP_CODE_GZ) &&
+			(vertexCode[2] == CLIP_CODE_GZ) ||
+
+			(vertexCode[0] == CLIP_CODE_LZ) &&
+			(vertexCode[1] == CLIP_CODE_LZ) &&
+			(vertexCode[2] == CLIP_CODE_LZ))
+		{
+			continue;
+		}
+
+		// 根据近裁剪面进行裁剪
+		if (((vertexCode[0] | vertexCode[1] | vertexCode[2]) & CLIP_CODE_LZ))
+		{
+			int v0 = 0;
+			int v1 = 0;
+			int v2 = 0;
+
+			float minZ = 0.1f;
+
+			// 三角形有1个顶点在近裁剪面内侧,2个顶点在外侧
+			if (vertexCountInView == 1)
+			{
+				// 第一步:找出位于内侧的顶点
+				if (vertexCode[0] == CLIP_CODE_IZ)
+				{
+					v0 = 0; v1 = 1; v2 = 2;
+				}
+				else if (vertexCode[1] == CLIP_CODE_IZ)
+				{
+					v0 = 1; v1 = 2; v2 = 0;
+				}
+				else
+				{
+					v0 = 2; v1 = 0; v2 = 1;
+				}
+
+				//float ratio1 = (face.vertex[v0].w - 0) / (face.vertex[v0].w - face.vertex[v1].w);
+				//float ratio2 = (face.vertex[v0].w - 0) / (face.vertex[v0].w - face.vertex[v2].w);
+
+				float ratio1 = (face.vertex[v1].z) / ((face.vertex[v1].z) - (face.vertex[v0].z));
+				float ratio2 = (face.vertex[v2].z) / ((face.vertex[v2].z) - (face.vertex[v0].z));
+
+				//float inv_ratio = 1.f - ratio1;
+				//face.vertex[v1] = SrFastLerp(face.vertex[v1], face.vertex[v0], ratio1, inv_ratio);
+
+				face.vertex[v1] = face.vertex[v1] + (face.vertex[v0] - face.vertex[v1])*ratio1;
+
+				//inv_ratio = 1.f - ratio2;
+				//face.vertex[v2] = SrFastLerp(face.vertex[v2], face.vertex[v0], ratio2, inv_ratio);
+				face.vertex[v2] = face.vertex[v2] + (face.vertex[v0] - face.vertex[v2])*ratio2;
+			}
+
+			// 三角形有2个顶点在近裁剪面内侧,1个顶点在外侧
+			else if (vertexCountInView == 2)
+			{
+				RenderFace newRenderFace(face);
+				Vector4* newVertex = newRenderFace.vertex;
+
+				// 第二步:找出位于外侧的顶点
+				if (vertexCode[0] == CLIP_CODE_LZ)
+				{
+					v0 = 0; v1 = 1; v2 = 2;
+				}
+				else if (vertexCode[1] == CLIP_CODE_LZ)
+				{
+					v0 = 1; v1 = 2; v2 = 0;
+				}
+				else
+				{
+					v0 = 2; v1 = 0; v2 = 1;
+				}
+
+// 				float ratio1 = (0 - face.vertex[v0].w) / (face.vertex[v1].w - face.vertex[v0].w);
+// 				float ratio2 = (0 - face.vertex[v0].w) / (face.vertex[v2].w - face.vertex[v0].w);
+
+				float ratio1 = (face.vertex[v0].z) / ((face.vertex[v0].z) - (face.vertex[v1].z));
+				float ratio2 = (face.vertex[v0].z) / ((face.vertex[v0].z) - (face.vertex[v2].z));
+
+				//float ratio1 = (face.vertex[v0].w - face.vertex[v0].z) / ((face.vertex[v0].w - face.vertex[v0].z) - (face.vertex[v1].w - face.vertex[v1].z));
+				//float ratio2 = (face.vertex[v0].w - face.vertex[v0].z) / ((face.vertex[v0].w - face.vertex[v0].z) - (face.vertex[v2].w - face.vertex[v2].z));
+				//float ratio2 = (0 - face.vertex[v0].w) / (face.vertex[v2].w - face.vertex[v0].w);
+
+				face.vertex[v0] = face.vertex[v0] + (face.vertex[v1] - face.vertex[v0])*ratio1;
+				//float inv_ratio = 1.f - ratio1;
+				//face.vertex[v0] = SrFastLerp(face.vertex[v0], face.vertex[v1], ratio1, inv_ratio);
+				
+				//inv_ratio = 1.f - ratio2;
+				//newVertex[v0] = SrFastLerp(newVertex[v0], newVertex[v1], ratio2, inv_ratio);
+				//newVertex[v1] = face.vertex[v0];
+
+				newVertex[v0] = newVertex[v0] + (newVertex[v2] - newVertex[v0])*ratio2;
+				newVertex[v1] = face.vertex[v0];
+
+				newRenderFace.color = 1;
+				mRasterizeList.push_back(newRenderFace);
+			}
+		}
+
+		face.color = 0;
+		mRasterizeList.push_back(face);
 	}
 }
