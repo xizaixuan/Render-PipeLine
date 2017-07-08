@@ -25,15 +25,15 @@ Engine::~Engine()
 Texture* texture = nullptr;
 void Engine::init(HINSTANCE hInstance, int nCmdShow)
 {
-	WinApp::getSingletonPtr()->create(hInstance, nCmdShow, 1024, 768, "SoftPipeLine");
+	WinApp::getSingletonPtr()->create(hInstance, nCmdShow, 1920.0f, 1080.0f, "SoftPipeLine");
 
-	RenderDevice::getSingletonPtr()->initRenderDevice(WinApp::getSingletonPtr()->getHwnd(), 1024, 768);
+	RenderDevice::getSingletonPtr()->initRenderDevice(WinApp::getSingletonPtr()->getHwnd(), 1920.0f, 1080.0f);
 
-	PipeLine::getSingletonPtr()->setViewPortData(1024.0f, 768.0f);
+	PipeLine::getSingletonPtr()->setViewPortData(1920.0f, 1080.0f);
 
 	mCamera = new Camera();
 
-	mCamera->update(60, 1024.0f/768.0f, 0.1f, 1000.0f);
+	mCamera->update(60, 1920.0f / 1080.0f, 0.1f, 1000.0f);
 
 
 	//////////////////////////////////////////////////////////////////////////
@@ -106,13 +106,15 @@ void Engine::destroy()
 
 void Engine::update(float dt)
 {
-	RenderDevice::getSingletonPtr()->cleanBuffer();
+	RenderDevice::getSingletonPtr()->renderBegin();
 
 	updateCamera(dt);
 
 	PipeLine::getSingletonPtr()->execute(mCamera);
 
 	RenderDevice::getSingletonPtr()->renderBuffer();
+
+	RenderDevice::getSingletonPtr()->renderEnd();
 }
 
 /// \brief 相机数据更新

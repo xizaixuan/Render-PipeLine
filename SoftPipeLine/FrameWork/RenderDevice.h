@@ -8,7 +8,10 @@
 #define _RenderDevice_H_
 
 #include <windows.h>
+#include <D2D1_1.h>
 #include "../Util/Singleton.h"
+
+#define SAFE_RELEASE(P) if(P){P->Release() ; P = NULL ;}
 
 class RenderDevice :public Singleton <RenderDevice>
 {
@@ -21,11 +24,14 @@ public:
 	/// \brief 初始化渲染设备
 	void initRenderDevice(HWND hWndMain,int WindowWidth,int WindowHeight);
 
+	/// brief 渲染开始
+	void renderBegin();
+
+	/// brief 渲染结束
+	void renderEnd();
+
 	/// \brief 更新Buffer
 	void renderBuffer();
-
-	/// \brief 清空Buffer
-	void cleanBuffer();
 	
 	/// \brief 绘制color
 	void drawPixel(DWORD x, DWORD y, DWORD color);
@@ -34,8 +40,7 @@ public:
 	void drawPixel(DWORD x, DWORD y, DWORD color, float depth);
 
 private:
-	///	像素Buffer
-	DWORD*	mPixelBuffer;
+	/// 深度缓存
 	float*	mZBuffer;
 
 	///	窗口宽度
@@ -44,17 +49,20 @@ private:
 	///	窗口高度
 	DWORD	mWindowHeight;
 
-	///	窗口设备环境句柄
-	HDC		mHDC;
-
-	///	窗口兼容设备环境句柄
-	HDC		mCDC;
-
-	/// 渲染位图句柄
-	HBITMAP mRenderBitMap;
-
 	///	窗口句柄
 	HWND	mHWND;
+
+	/// 实例工厂
+	ID2D1Factory*			mD2DFactory;
+
+	/// 渲染目标
+	ID2D1HwndRenderTarget*	mRenderTarget;
+
+	/// 位图
+	ID2D1Bitmap*			mBitmap;
+
+	/// 渲染数据
+	DWORD*					mDataBuffer;
 };
 
 #endif

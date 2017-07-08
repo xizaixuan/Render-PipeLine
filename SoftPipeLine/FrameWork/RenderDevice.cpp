@@ -4,21 +4,20 @@
 RenderDevice::RenderDevice(void)
 	: mWindowWidth(0)
 	, mWindowHeight(0)
-	, mPixelBuffer(nullptr)
-	, mHDC(nullptr)
-	, mCDC(nullptr)
-	, mRenderBitMap(nullptr)
 	, mHWND(nullptr)
 	, mZBuffer(nullptr)
+	, mD2DFactory(nullptr)
+	, mRenderTarget(nullptr)
+	, mBitmap(nullptr)
+	, mDataBuffer(nullptr)
 {
 }
 
 RenderDevice::~RenderDevice(void)
 {
-	mPixelBuffer = nullptr;
-
-	DeleteDC(mCDC);
-	ReleaseDC(mHWND, mHDC);
+	SAFE_RELEASE(mRenderTarget);
+	SAFE_RELEASE(mD2DFactory);
+	SAFE_RELEASE(mBitmap);
 
 	if (mZBuffer != nullptr)
 	{
@@ -35,51 +34,81 @@ void RenderDevice::initRenderDevice(HWND hWndMain,int WindowWidth,int WindowHeig
 
 	mHWND = hWndMain;
 
-	mHDC = GetWindowDC(hWndMain);
+	if (mRenderTarget == nullptr)
+	{
+		HRESULT hr;
 
-	mCDC = CreateCompatibleDC(mHDC);
+		hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &mD2DFactory);
+		if (FAILED(hr))
+		{
+			MessageBox(mHWND, "Create D2D factory failed!", "Error", 0);
+			return;
+		}
 
-	// 配置BITMAPINFO信息
-	BITMAPINFO bmpinfo;
-	bmpinfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-	bmpinfo.bmiHeader.biWidth = WindowWidth;
-	bmpinfo.bmiHeader.biHeight = WindowHeight;
-	bmpinfo.bmiHeader.biPlanes = 1;
-	bmpinfo.bmiHeader.biBitCount = 32;
-	bmpinfo.bmiHeader.biCompression = BI_RGB;
-	bmpinfo.bmiHeader.biSizeImage = WindowWidth * WindowHeight * 32/8;
-	bmpinfo.bmiHeader.biXPelsPerMeter = 0;
-	bmpinfo.bmiHeader.biClrImportant = 0;
-	bmpinfo.bmiHeader.biClrUsed = 0;
+		D2D1_PIXEL_FORMAT pixelFormat = D2D1::PixelFormat(
+			DXGI_FORMAT_B8G8R8A8_UNORM,
+			D2D1_ALPHA_MODE_IGNORE
+		);
 
-	// 申请内存, 无需手动释放
-	mRenderBitMap = CreateDIBSection(mCDC, &bmpinfo, DIB_RGB_COLORS, (void**)&mPixelBuffer, NULL, 0);
+		D2D1_RENDER_TARGET_PROPERTIES props = D2D1::RenderTargetProperties();
+		props.pixelFormat = pixelFormat;
+
+		hr = mD2DFactory->CreateHwndRenderTarget(
+			props,
+			D2D1::HwndRenderTargetProperties(mHWND, D2D1::SizeU(mWindowWidth, mWindowHeight)),
+			&mRenderTarget
+		);
+
+		if (FAILED(hr))
+		{
+			MessageBox(mHWND, "Create render target failed!", "Error", 0);
+			return;
+		}
+
+		//创建位图    
+		D2D1_SIZE_U imgsize = D2D1::SizeU(mWindowWidth, mWindowHeight);
+		D2D1_BITMAP_PROPERTIES prop =  
+		{
+			pixelFormat,
+			(float)imgsize.width,
+			(float)imgsize.height
+		};
+		long pitch = imgsize.width;
+		mDataBuffer = new DWORD[imgsize.width * imgsize.height];
+		memset(mDataBuffer, 0, imgsize.width * imgsize.height * sizeof(DWORD));
+		mRenderTarget->CreateBitmap(imgsize, mDataBuffer, pitch, &prop, &mBitmap);
+	}
 
 	mZBuffer = new float[WindowWidth*WindowHeight];
 }
 
-void RenderDevice::renderBuffer()
+void RenderDevice::renderBegin()
 {
-	HGDIOBJ hOldSel = SelectObject(mCDC, mRenderBitMap);
- 
-	//将CompatibleDC的数据复制到屏幕显示DC中
-	BitBlt(mHDC, 0, 0, mWindowWidth, mWindowHeight, mCDC, 0, 0, SRCCOPY);
+	mRenderTarget->BeginDraw();
 
-	SelectObject(mCDC, hOldSel);
+	// 设置背景色
+	mRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::Black));
+	memset(mDataBuffer, 0, mWindowWidth * mWindowHeight * sizeof(DWORD));
 }
 
-void RenderDevice::cleanBuffer()
+void RenderDevice::renderEnd()
 {
-	memset(mPixelBuffer, 0x00, sizeof(DWORD)*mWindowWidth*mWindowHeight);
+	mRenderTarget->EndDraw();
+}
 
-	memset(mZBuffer, 0x7f, sizeof(float)*mWindowWidth*mWindowHeight);
+void RenderDevice::renderBuffer()
+{
+	D2D1_RECT_U rect2 = D2D1::RectU(0, 0, mWindowWidth, mWindowHeight);
+	mBitmap->CopyFromMemory(&rect2, mDataBuffer, mWindowWidth * sizeof(DWORD));
+	mRenderTarget->DrawBitmap(mBitmap, D2D1::RectF(0.0f, 0.0f, mWindowWidth, mWindowHeight));
 }
 
 void RenderDevice::drawPixel(DWORD x, DWORD y, DWORD color)
 {
 	if (x < mWindowWidth && y < mWindowHeight)
 	{
-		mPixelBuffer[x + (mWindowHeight-1-y)*mWindowWidth] = color;
+		int index = x + y*mWindowWidth;
+		mDataBuffer[index] = color;
 	}
 }
 
@@ -87,10 +116,11 @@ void RenderDevice::drawPixel(DWORD x, DWORD y, DWORD color, float depth)
 {
 	if (x < mWindowWidth && y < mWindowHeight)
 	{
-		int index = x + (mWindowHeight - 1 - y)*mWindowWidth;
+		int index = x + y*mWindowWidth;
+		mDataBuffer[index ] = color;
+
 		if (depth < mZBuffer[index])
 		{
-			mPixelBuffer[index] = color;
 			mZBuffer[index] = depth;
 		}
 	}
