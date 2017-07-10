@@ -10,6 +10,9 @@
 
 Engine::Engine()
 	: mCamera(nullptr)
+	, mRadius(5.0f)
+	, mPhi(1.0f)
+	, mTheta(1.0f)
 {
 }
 
@@ -25,15 +28,15 @@ Engine::~Engine()
 Texture* texture = nullptr;
 void Engine::init(HINSTANCE hInstance, int nCmdShow)
 {
-	WinApp::getSingletonPtr()->create(hInstance, nCmdShow, 1920.0f, 1080.0f, "SoftPipeLine");
+	WinApp::getSingletonPtr()->create(hInstance, nCmdShow, 1024.0f, 768.0f, "SoftPipeLine");
 
-	RenderDevice::getSingletonPtr()->initRenderDevice(WinApp::getSingletonPtr()->getHwnd(), 1920.0f, 1080.0f);
+	RenderDevice::getSingletonPtr()->initRenderDevice(WinApp::getSingletonPtr()->getHwnd(), 1024.0f, 768.0f);
 
-	PipeLine::getSingletonPtr()->setViewPortData(1920.0f, 1080.0f);
+	PipeLine::getSingletonPtr()->setViewPortData(1024.0f, 768.0f);
 
 	mCamera = new Camera();
 
-	mCamera->update(60, 1920.0f / 1080.0f, 0.1f, 1000.0f);
+	mCamera->update(60, 1024.0f / 768.0f, 0.1f, 1000.0f);
 
 
 	//////////////////////////////////////////////////////////////////////////
@@ -117,67 +120,79 @@ void Engine::update(float dt)
 	RenderDevice::getSingletonPtr()->renderEnd();
 }
 
-/// \brief 相机数据更新
+
+void Engine::OnMouseDown(WPARAM btnState, int x, int y)
+{
+}
+
+void Engine::OnMouseUp(WPARAM btnState, int x, int y)
+{
+}
+
+void Engine::OnMouseMove(WPARAM btnState, int x, int y)
+{
+	auto Clamp = [](float num, float min, float max)
+	{
+		if (num<= min)
+		{
+			return min;
+		}
+		else if (num>= max)
+		{
+			return max;
+		}
+		else
+		{
+			return num;
+		}
+	};
+
+	if ((btnState & MK_LBUTTON) != 0)
+	{
+		auto DEG2RAD = [](float degree)
+		{
+			return PI / 180.0f * degree;
+		};
+
+		// Make each pixel correspond to a quarter of a degree.
+		float dx = DEG2RAD(0.25f*static_cast<float>(x - mLastMousePos.x));
+		float dy = DEG2RAD(0.25f*static_cast<float>(y - mLastMousePos.y));
+
+		// Update angles based on input to orbit camera around box.
+		mTheta += dx;
+		mPhi += dy;
+
+		// Restrict the angle mPhi.
+		mPhi = Clamp(mPhi, 0.1f, PI - 0.1f);
+	}
+	else if ((btnState & MK_RBUTTON) != 0)
+	{
+		// Make each pixel correspond to 0.005 unit in the scene.
+		float dx = 0.005f*static_cast<float>(x - mLastMousePos.x);
+		float dy = 0.005f*static_cast<float>(y - mLastMousePos.y);
+
+		// Update the camera radius based on input.
+		mRadius += dx - dy;
+
+		// Restrict the radius.
+		mRadius = Clamp(mRadius, 1.0f, 15.0f);
+	}
+
+	mLastMousePos.x = x;
+	mLastMousePos.y = y;
+}
+
+
 void Engine::updateCamera(float dt)
 {
-	static float theta = 0.0f;
-	static float radius = 4.0;
+	// Convert Spherical to Cartesian coordinates.
+	float x = mRadius*sinf(mPhi)*cosf(mTheta);
+	float z = mRadius*sinf(mPhi)*sinf(mTheta);
+	float y = mRadius*cosf(mPhi);
 
-	static Vector3 position(4.0f, 0.0f, 0.0f);
-	static Vector3 target(0.0f, 0.0f, 0.0f);
+	// Build the view matrix.
+	Vector3 pos		= Vector3(x, y, z);
+	Vector3 target	= Vector3(0.0f, 0.0f, 0.0f);
 
-	static POINT last;
-
-	POINT pt;
-	GetCursorPos(&pt);
-
-	if (GetKeyState(VK_RBUTTON) & 0x8000)
-	{
-		theta -= dt*(pt.x - last.x);
-	}
-
-	if (GetKeyState(VK_MBUTTON) & 0x8000)
-	{
-		float dx = dt*static_cast<float>(pt.x - last.x);
-		float dy = dt*static_cast<float>(pt.y - last.y);
-
-		radius += dx - dy;
-
-		radius = max(radius, 0);
-	}
-
-	last = pt;
-
-	position.x = radius*cosf(theta);
-	position.z = radius*sinf(theta);
-
-	static Vector2 pos(0.0f, 0.0f);
-
-	if (GetKeyState(VK_UP) & 0x8000)
-	{
-		pos.x -= 0.000001;
-	}
-
-	if (GetKeyState(VK_DOWN) & 0x8000)
-	{
-		pos.x += 0.000001;
-	}
-
-	if (GetKeyState(VK_LEFT) & 0x8000)
-	{
-		pos.y -= 0.000001;
-	}
-
-	if (GetKeyState(VK_RIGHT) & 0x8000)
-	{
-		pos.y += 0.000001;
-	}
-
-	position.x += pos.x;
-	position.z += pos.y;
-
-	target.x += pos.x;
-	target.z += pos.y;
-
-	mCamera->update(position, target);
+	mCamera->update(pos, target);
 }
