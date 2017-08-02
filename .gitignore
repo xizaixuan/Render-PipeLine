@@ -30,3 +30,17 @@
 *.exe
 *.out
 *.app
+.vs/Render-PipeLine/v15/.suo
+*.db
+*.opendb
+*.ipch
+*.idb
+*.pdb
+*.db-shm
+*.db-wal
+*.ilk
+Render-PipeLine/Debug/Render-PipeLine.Build.CppClean.log
+*.tlog
+Render-PipeLine/Debug/Render-PipeLine.log
+Tutorial1-Framework/Debug/Tutorial1-Framework.log
+Tutorial1-Framework/Debug/Tutorial1-Framework.Build.CppClean.log
