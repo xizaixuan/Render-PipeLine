@@ -28,7 +28,10 @@ public:
 	void update(float dt);
 
 	/// brief 绘制直线
-	void drawLine(float startX, float startY, float endX, float endY);
+	void drawLineWithDDA(float startX, float startY, float endX, float endY);
+
+	/// brief 绘制直线
+	void drawLineWithBresenham(float startX, float startY, float endX, float endY);
 };
 
 
