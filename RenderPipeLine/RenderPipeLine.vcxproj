@@ -121,14 +121,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Framework\Engine.h" />
     <ClInclude Include="Framework\RenderDevice.h" />
     <ClInclude Include="Framework\WinApp.h" />
     <ClInclude Include="Utility\PipeLineUtility.h" />
     <ClInclude Include="Utility\Singleton.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Framework\Engine.cpp" />
     <ClCompile Include="Framework\RenderDevice.cpp" />
     <ClCompile Include="Framework\WinApp.cpp" />
     <ClCompile Include="Utility\PipeLineUtility.cpp" />

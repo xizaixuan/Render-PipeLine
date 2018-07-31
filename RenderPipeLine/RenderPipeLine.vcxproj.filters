@@ -23,9 +23,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Framework\Engine.h">
-      <Filter>Header Files\Framework</Filter>
-    </ClInclude>
     <ClInclude Include="Framework\RenderDevice.h">
       <Filter>Header Files\Framework</Filter>
     </ClInclude>
@@ -40,9 +37,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Framework\Engine.cpp">
-      <Filter>Source Files\Framework</Filter>
-    </ClCompile>
     <ClCompile Include="Framework\RenderDevice.cpp">
       <Filter>Source Files\Framework</Filter>
     </ClCompile>

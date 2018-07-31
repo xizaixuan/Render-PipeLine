@@ -1,6 +1,6 @@
 #include "Engine.h"
-#include "WinApp.h"
-#include "RenderDevice.h"
+#include "..\RenderPipeLine\Framework\WinApp.h"
+#include "..\RenderPipeLine\Framework\RenderDevice.h"
 
 Engine::Engine()
 {

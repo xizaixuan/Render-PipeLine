@@ -1,5 +1,5 @@
 #include <windows.h>
-#include "..\RenderPipeLine\Framework\Engine.h"
+#include "Engine.h"
 
 // Main function
 int	WINAPI	WinMain(	IN HINSTANCE hInstance,
@@ -19,7 +19,7 @@ int	WINAPI	WinMain(	IN HINSTANCE hInstance,
 	QueryPerformanceCounter((LARGE_INTEGER*)&prevTimeStamp);
 	
 	MSG msg;
-	for(;;)
+	while(true)
 	{
 		if(PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
 		{
