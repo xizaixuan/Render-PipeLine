@@ -124,7 +124,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Framework\Engine.cpp" />
-    <ClCompile Include="Framework\Main.cpp" />
     <ClCompile Include="Framework\RenderDevice.cpp" />
     <ClCompile Include="Framework\WinApp.cpp" />
   </ItemGroup>

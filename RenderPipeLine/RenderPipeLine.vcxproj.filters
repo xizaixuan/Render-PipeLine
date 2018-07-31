@@ -43,8 +43,5 @@
     <ClCompile Include="Framework\WinApp.cpp">
       <Filter>Source Files\Framework</Filter>
     </ClCompile>
-    <ClCompile Include="Framework\Main.cpp">
-      <Filter>Source Files\Framework</Filter>
-    </ClCompile>
   </ItemGroup>
 </Project>
