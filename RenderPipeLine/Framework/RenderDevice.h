@@ -12,9 +12,7 @@
 #include "..\Utility\Singleton.h"
 
 
-#define SAFE_RELEASE(P) if(P != nullptr){P->Release() ; P = nullptr;}
-#define SAFE_DELETE(P) if(P != nullptr){delete P; P = nullptr;}
-#define SAFE_DELETE_ARRAY(P) if(P != nullptr){delete[] P; P = nullptr;}
+
 
 class RenderDevice :public Singleton <RenderDevice>
 {

@@ -18,6 +18,9 @@
     <Filter Include="Header Files\Utility">
       <UniqueIdentifier>{8193d191-69c6-4362-bd3a-1bae37bf11f2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Utility">
+      <UniqueIdentifier>{d5499840-8f05-442b-aed5-dfd7feae7acc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Framework\Engine.h">
@@ -32,6 +35,9 @@
     <ClInclude Include="Utility\Singleton.h">
       <Filter>Header Files\Utility</Filter>
     </ClInclude>
+    <ClInclude Include="Utility\PipeLineUtility.h">
+      <Filter>Header Files\Utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Framework\Engine.cpp">
@@ -42,6 +48,9 @@
     </ClCompile>
     <ClCompile Include="Framework\WinApp.cpp">
       <Filter>Source Files\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="Utility\PipeLineUtility.cpp">
+      <Filter>Source Files\Utility</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

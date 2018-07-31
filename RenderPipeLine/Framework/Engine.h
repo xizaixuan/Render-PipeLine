@@ -28,5 +28,4 @@ public:
 	void update(float dt);
 };
 
-
 #endif

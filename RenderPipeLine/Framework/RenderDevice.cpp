@@ -1,5 +1,6 @@
 #include "RenderDevice.h"
 #include <wingdi.h>
+#include "..\Utility\PipeLineUtility.h"
 
 RenderDevice::RenderDevice(void)
 	: mWindowWidth(0)
@@ -93,7 +94,7 @@ void RenderDevice::renderBuffer()
 {
 	D2D1_RECT_U rect2 = D2D1::RectU(0, 0, mWindowWidth, mWindowHeight);
 	mBitmap->CopyFromMemory(&rect2, mDataBuffer, mWindowWidth * sizeof(DWORD));
-	mRenderTarget->DrawBitmap(mBitmap, D2D1::RectF(0.0f, 0.0f, mWindowWidth-1, mWindowHeight-1));
+	mRenderTarget->DrawBitmap(mBitmap, D2D1::RectF(0.0f, 0.0f, mWindowWidth-1.0f, mWindowHeight-1.0f));
 }
 
 void RenderDevice::drawPixel(DWORD x, DWORD y, DWORD color)
