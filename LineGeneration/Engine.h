@@ -26,6 +26,9 @@ public:
 
 	/// \brief ¸üĞÂ
 	void update(float dt);
+
+	/// \brief äÖÈ¾³¡¾°
+	void renderScene();
 };
 
 #endif

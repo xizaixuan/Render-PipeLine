@@ -15,10 +15,17 @@
 #define SAFE_DELETE(P) if(P != nullptr){delete P; P = nullptr;}
 #define SAFE_DELETE_ARRAY(P) if(P != nullptr){delete[] P; P = nullptr;}
 
-/// brief 绘制直线
-void drawLineWithDDA(float startX, float startY, float endX, float endY);
+enum DrawLineType
+{
+	DDA,
+	Bresenham,
+};
 
-/// brief 绘制直线
-void drawLineWithBresenham(float startX, float startY, float endX, float endY);
+class PipeLine
+{
+public:
+	/// brief 绘制直线
+	static void drawLine(float startX, float startY, float endX, float endY, DWORD color, DrawLineType type);
+};
 
 #endif
