@@ -3,22 +3,70 @@
 
 void PipeLine::drawLine(float startX, float startY, float endX, float endY, DWORD color, DrawLineType type)
 {
-	//DDAÀ„∑®
-	float difX = endX - startX;
-	float difY = endY - startY;
-	float steps = std::max<float>(std::abs(difX), std::abs(difY));
+	float dx = endX - startX;
+	float dy = endY - startY;
 
-	float increx = difX / steps;
-	float increy = difY / steps;
-
-	float xi = startX;
-	float yi = startY;
-
-	for (int i = 0; i < steps; i++)
+	switch (type)
 	{
-		RenderDevice::getSingletonPtr()->drawPixel((int)xi, (int)yi, color);
+	case DDA:
+	{
+		float steps = std::max<float>(std::abs(dx), std::abs(dy));
 
-		xi += increx;
-		yi += increy;
+		float increx = dx / steps;
+		float increy = dy / steps;
+
+		float xi = startX;
+		float yi = startY;
+
+		for (int i = 0; i < steps; i++)
+		{
+			RenderDevice::getSingletonPtr()->drawPixel(std::round(xi), std::round(yi), color);
+
+			xi += increx;
+			yi += increy;
+		}
 	}
+	break;
+	case Bresenham:
+	{
+		int ux = (dx > 0) ? 1 : -1;
+		int uy = (dy > 0) ? 1 : -1;
+
+		int xi = startX;
+		int yi = startY;
+
+		int eps = 0.0f;
+		dx = std::abs(dx);
+		dy = std::abs(dy);
+
+		if (dx > dy)
+		{
+			for (; xi != endX; xi += ux)
+			{
+				RenderDevice::getSingletonPtr()->drawPixel(xi, yi, color);
+				eps += dy;
+				if ((eps << 1) >= dx)
+				{
+					yi += uy; eps -= dx;
+				}
+			}
+		}
+		else
+		{
+			for (; yi != endY; yi += uy)
+			{
+				RenderDevice::getSingletonPtr()->drawPixel(xi, yi, color);
+				eps += dx;
+				if ((eps << 1) >= dy)
+				{
+					xi += ux; eps -= dy;
+				}
+			}
+		}
+	}
+	break;
+	default:
+		break;
+	}
+	
 }

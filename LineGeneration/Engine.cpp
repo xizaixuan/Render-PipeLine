@@ -39,4 +39,5 @@ void Engine::renderScene()
 	DWORD color = (255 << 24) + (255 << 16) + (255 << 8) + 255;
 
 	PipeLine::drawLine(50, 50, 500, 500, color, DrawLineType::DDA);
+	PipeLine::drawLine(50 + 50, 50, 500 + 50, 500, color, DrawLineType::Bresenham);
 }
