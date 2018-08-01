@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.26430.6
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RenderPipeLine", "RenderPipeLine\RenderPipeLine.vcxproj", "{8D29B430-A366-4691-9224-EDC490CF4C45}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Line-Generation", "LineGeneration\LineGeneration.vcxproj", "{7FF7F4D7-7B7B-4138-8CF1-60F4B8150A2D}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Scene", "Scene\Scene.vcxproj", "{7FF7F4D7-7B7B-4138-8CF1-60F4B8150A2D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

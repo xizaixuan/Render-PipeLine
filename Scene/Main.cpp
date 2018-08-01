@@ -8,7 +8,7 @@ int	WINAPI	WinMain(	IN HINSTANCE hInstance,
 						IN int nCmdShow)
 {
 	// 初始化
-	Engine::getSingletonPtr()->init(hInstance, nCmdShow, 1920, 1080);
+	Engine::getSingletonPtr()->init(hInstance, nCmdShow, 1024, 768);
 
 	// 计时器
 	__int64 cntsPerSec = 0;
