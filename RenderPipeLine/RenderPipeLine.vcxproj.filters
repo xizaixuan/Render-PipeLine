@@ -21,6 +21,12 @@
     <Filter Include="Source Files\Utility">
       <UniqueIdentifier>{d5499840-8f05-442b-aed5-dfd7feae7acc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Mathematics">
+      <UniqueIdentifier>{3bedb6e8-82bd-48b7-8150-f131343a6626}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Mathematics">
+      <UniqueIdentifier>{ea76da8d-9343-4f95-95b5-4efeeda0e2bf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Framework\RenderDevice.h">
@@ -35,6 +41,15 @@
     <ClInclude Include="Utility\PipeLineUtility.h">
       <Filter>Header Files\Utility</Filter>
     </ClInclude>
+    <ClInclude Include="Mathematics\Float2.h">
+      <Filter>Header Files\Mathematics</Filter>
+    </ClInclude>
+    <ClInclude Include="Mathematics\Float3.h">
+      <Filter>Header Files\Mathematics</Filter>
+    </ClInclude>
+    <ClInclude Include="Mathematics\Float4.h">
+      <Filter>Header Files\Mathematics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Framework\RenderDevice.cpp">
@@ -45,6 +60,15 @@
     </ClCompile>
     <ClCompile Include="Utility\PipeLineUtility.cpp">
       <Filter>Source Files\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="Mathematics\Float4.cpp">
+      <Filter>Source Files\Mathematics</Filter>
+    </ClCompile>
+    <ClCompile Include="Mathematics\Float2.cpp">
+      <Filter>Source Files\Mathematics</Filter>
+    </ClCompile>
+    <ClCompile Include="Mathematics\Float3.cpp">
+      <Filter>Source Files\Mathematics</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
