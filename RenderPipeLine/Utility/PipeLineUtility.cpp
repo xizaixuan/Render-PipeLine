@@ -41,25 +41,27 @@ void PipeLine::drawLine(float startX, float startY, float endX, float endY, DWOR
 
 		if (dx > dy)
 		{
-			for (; xi != endX; xi += ux)
+			for (; xi != std::round(endX); xi += ux)
 			{
 				RenderDevice::getSingletonPtr()->drawPixel(xi, yi, color);
 				eps += dy;
 				if ((eps << 1) >= dx)
 				{
-					yi += uy; eps -= dx;
+					yi += uy;
+					eps -= dx;
 				}
 			}
 		}
 		else
 		{
-			for (; yi != endY; yi += uy)
+			for (; yi != std::round(endY); yi += uy)
 			{
 				RenderDevice::getSingletonPtr()->drawPixel(xi, yi, color);
 				eps += dx;
 				if ((eps << 1) >= dy)
 				{
-					xi += ux; eps -= dy;
+					xi += ux;
+					eps -= dy;
 				}
 			}
 		}
