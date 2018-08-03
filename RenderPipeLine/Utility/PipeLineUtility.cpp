@@ -3,13 +3,13 @@
 
 void PipeLine::drawLine(float startX, float startY, float endX, float endY, DWORD color, DrawLineType type)
 {
-	float dx = endX - startX;
-	float dy = endY - startY;
-
 	switch (type)
 	{
 	case DDA:
 	{
+		float dx = endX - startX;
+		float dy = endY - startY;
+
 		float steps = std::max<float>(std::abs(dx), std::abs(dy));
 
 		float increx = dx / steps;
@@ -29,6 +29,9 @@ void PipeLine::drawLine(float startX, float startY, float endX, float endY, DWOR
 	break;
 	case Bresenham:
 	{
+		int dx = endX - startX;
+		int dy = endY - startY;
+
 		int ux = (dx > 0) ? 1 : -1;
 		int uy = (dy > 0) ? 1 : -1;
 
