@@ -11,9 +11,9 @@ WinApp::~WinApp()
 
 void WinApp::create(HINSTANCE hInstance, int nCmdShow, int width, int height, LPSTR caption)
 {
-	mWidth		= width;
-	mHeight		= height;
-	mCaption	= caption;
+	m_Width		= width;
+	m_Height		= height;
+	m_Caption	= caption;
 
 	registerClass(hInstance);
 
@@ -22,17 +22,17 @@ void WinApp::create(HINSTANCE hInstance, int nCmdShow, int width, int height, LP
 
 int	WinApp::getWidth()
 {
-	return mWidth;
+	return m_Width;
 }
 
 int	WinApp::getHeight()
 {
-	return mHeight;
+	return m_Height;
 }
 
 HWND WinApp::getHwnd()
 {
-	return mHWND;
+	return m_HWND;
 }
 
 WORD WinApp::registerClass(HINSTANCE hInstance)
@@ -50,7 +50,7 @@ WORD WinApp::registerClass(HINSTANCE hInstance)
 	wcex.hCursor		= LoadCursor(NULL, IDC_ARROW);
 	wcex.hbrBackground	= (HBRUSH)(COLOR_WINDOW+1);
 	wcex.lpszMenuName	= NULL;
-	wcex.lpszClassName	= mCaption;
+	wcex.lpszClassName	= m_Caption;
 	wcex.hIconSm		= NULL;
 
 	return RegisterClassEx(&wcex);
@@ -58,23 +58,23 @@ WORD WinApp::registerClass(HINSTANCE hInstance)
 
 bool WinApp::init(HINSTANCE hInstance, int nCmdShow)
 {
-	mHWND = CreateWindow(
-		mCaption, 
-		mCaption, 
+	m_HWND = CreateWindow(
+		m_Caption, 
+		m_Caption, 
 		WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT, 
 		0, 
-		mWidth,
-		mHeight, 
+		m_Width,
+		m_Height, 
 		NULL, 
 		NULL, 
 		hInstance, 
 		NULL);
 
-	if (!mHWND)
+	if (!m_HWND)
 		return false;
 
-	ShowWindow(mHWND, nCmdShow);
+	ShowWindow(m_HWND, nCmdShow);
 
 	return true;
 }

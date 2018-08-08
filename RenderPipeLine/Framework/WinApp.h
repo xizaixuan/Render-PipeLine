@@ -41,16 +41,16 @@ private:
 	static	LRESULT CALLBACK  wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	///	窗口名称
-	LPSTR	mCaption;
+	LPSTR	m_Caption;
 
 	///	窗口高度
-	int		mHeight;
+	int		m_Height;
 
 	///	窗口宽度
-	int		mWidth;
+	int		m_Width;
 
 	///	窗口句柄
-	HWND	mHWND;
+	HWND	m_HWND;
 };
 
 #endif
