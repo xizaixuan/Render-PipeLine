@@ -126,6 +126,7 @@
     <ClInclude Include="Mathematics\Float2.h" />
     <ClInclude Include="Mathematics\Float3.h" />
     <ClInclude Include="Mathematics\Float4.h" />
+    <ClInclude Include="Mathematics\Matrix.h" />
     <ClInclude Include="Utility\PipeLineUtility.h" />
     <ClInclude Include="Utility\Singleton.h" />
   </ItemGroup>
@@ -135,6 +136,7 @@
     <ClCompile Include="Mathematics\Float2.cpp" />
     <ClCompile Include="Mathematics\Float3.cpp" />
     <ClCompile Include="Mathematics\Float4.cpp" />
+    <ClCompile Include="Mathematics\Matrix.cpp" />
     <ClCompile Include="Utility\PipeLineUtility.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

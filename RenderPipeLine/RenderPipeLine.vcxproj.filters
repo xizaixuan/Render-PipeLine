@@ -50,6 +50,9 @@
     <ClInclude Include="Mathematics\Float4.h">
       <Filter>Header Files\Mathematics</Filter>
     </ClInclude>
+    <ClInclude Include="Mathematics\Matrix.h">
+      <Filter>Header Files\Mathematics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Framework\RenderDevice.cpp">
@@ -68,6 +71,9 @@
       <Filter>Source Files\Mathematics</Filter>
     </ClCompile>
     <ClCompile Include="Mathematics\Float3.cpp">
+      <Filter>Source Files\Mathematics</Filter>
+    </ClCompile>
+    <ClCompile Include="Mathematics\Matrix.cpp">
       <Filter>Source Files\Mathematics</Filter>
     </ClCompile>
   </ItemGroup>
