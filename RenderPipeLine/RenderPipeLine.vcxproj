@@ -121,21 +121,25 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Framework\Camera.h" />
     <ClInclude Include="Framework\RenderDevice.h" />
     <ClInclude Include="Framework\WinApp.h" />
     <ClInclude Include="Mathematics\Float2.h" />
     <ClInclude Include="Mathematics\Float3.h" />
     <ClInclude Include="Mathematics\Float4.h" />
+    <ClInclude Include="Mathematics\MathUtil.h" />
     <ClInclude Include="Mathematics\Matrix.h" />
     <ClInclude Include="Utility\PipeLineUtility.h" />
     <ClInclude Include="Utility\Singleton.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Framework\Camera.cpp" />
     <ClCompile Include="Framework\RenderDevice.cpp" />
     <ClCompile Include="Framework\WinApp.cpp" />
     <ClCompile Include="Mathematics\Float2.cpp" />
     <ClCompile Include="Mathematics\Float3.cpp" />
     <ClCompile Include="Mathematics\Float4.cpp" />
+    <ClCompile Include="Mathematics\MathUtil.cpp" />
     <ClCompile Include="Mathematics\Matrix.cpp" />
     <ClCompile Include="Utility\PipeLineUtility.cpp" />
   </ItemGroup>

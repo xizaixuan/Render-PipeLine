@@ -53,6 +53,12 @@
     <ClInclude Include="Mathematics\Matrix.h">
       <Filter>Header Files\Mathematics</Filter>
     </ClInclude>
+    <ClInclude Include="Framework\Camera.h">
+      <Filter>Header Files\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="Mathematics\MathUtil.h">
+      <Filter>Header Files\Mathematics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Framework\RenderDevice.cpp">
@@ -74,6 +80,12 @@
       <Filter>Source Files\Mathematics</Filter>
     </ClCompile>
     <ClCompile Include="Mathematics\Matrix.cpp">
+      <Filter>Source Files\Mathematics</Filter>
+    </ClCompile>
+    <ClCompile Include="Framework\Camera.cpp">
+      <Filter>Source Files\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="Mathematics\MathUtil.cpp">
       <Filter>Source Files\Mathematics</Filter>
     </ClCompile>
   </ItemGroup>
