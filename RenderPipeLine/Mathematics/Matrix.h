@@ -7,6 +7,8 @@
 #ifndef _Matrix_H_
 #define _Matrix_H_
 
+#include "Float4.h"
+
 class Matrix
 {
 public:
@@ -14,11 +16,7 @@ public:
 	Matrix(void);
 
 	/// \brief 带参数构造函数
-	Matrix(
-		float m00, float m01, float m02, float m03,
-		float m10, float m11, float m12, float m13,
-		float m20, float m21, float m22, float m23,
-		float m30, float m31, float m32, float m33);
+	Matrix(float4 row0, float4 row1, float4 row2, float4 row3);
 
 	/// \brief 析构函数
 	~Matrix(void);
@@ -26,29 +24,22 @@ public:
 	/// \brief 重载赋值运算符,并返回引用，以实现左值
 	Matrix& operator =(const Matrix& a);
 
-	/// \brief 重载二元"+"运算符
-	Matrix operator +(const Matrix& a) const;
-
 	/// \brief 重载二元"*"运算符
+	Matrix operator *(const float4& a) const;
 	Matrix operator *(const Matrix& a) const;
 
 public:
 	/// \brief 置为单位矩阵
 	void identity();
 
-	/// \brief 初始化
-	void set(
-		float m00, float m01, float m02, float m03,
-		float m10, float m11, float m12, float m13,
-		float m20, float m21, float m22, float m23,
-		float m30, float m31, float m32, float m33);
+	/// \brief 设置参数
+	void set(float4 row0, float4 row1, float4 row2, float4 row3);
 
 public:
-	union
-	{
-		float	m[4][4];
-		float	M[16];
-	};
+	float4 r0;
+	float4 r1;
+	float4 r2;
+	float4 r3;
 };
 
 #endif
