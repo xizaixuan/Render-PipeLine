@@ -14,7 +14,7 @@
 
 
 
-class RenderDevice :public Singleton <RenderDevice>
+class RenderDevice : public Singleton <RenderDevice>
 {
 	SINGLETON_DEFINE(RenderDevice)
 private:
@@ -23,19 +23,19 @@ private:
 
 public:
 	/// \brief 初始化渲染设备
-	void initRenderDevice(HWND hWndMain,int WindowWidth,int WindowHeight);
+	void InitRenderDevice(HWND hWndMain,int WindowWidth,int WindowHeight);
 
 	/// brief 渲染开始
-	void renderBegin();
+	void RenderBegin();
 
 	/// brief 渲染结束
-	void renderEnd();
+	void RenderEnd();
 
 	/// \brief 更新Buffer
-	void renderBuffer();
+	void RenderBuffer();
 	
 	/// \brief 绘制color
-	void drawPixel(DWORD x, DWORD y, DWORD color);
+	void DrawPixel(DWORD x, DWORD y, DWORD color);
 
 private:
 	///	窗口宽度
@@ -48,16 +48,16 @@ private:
 	HWND	m_HWND;
 
 	/// 实例工厂
-	ID2D1Factory*			m_D2DFactory;
+	ID2D1Factory*			m_pD2DFactory;
 
 	/// 渲染目标
-	ID2D1HwndRenderTarget*	m_RenderTarget;
+	ID2D1HwndRenderTarget*	m_pRenderTarget;
 
 	/// 位图
-	ID2D1Bitmap*			m_Bitmap;
+	ID2D1Bitmap*			m_pBitmap;
 
 	/// 渲染数据
-	DWORD*					m_DataBuffer;
+	DWORD*					m_pDataBuffer;
 };
 
 #endif

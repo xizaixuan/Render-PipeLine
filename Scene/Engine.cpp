@@ -11,30 +11,30 @@ Engine::~Engine()
 {
 }
 
-void Engine::init(HINSTANCE hInstance, int nCmdShow, int width, int height)
+void Engine::Init(HINSTANCE hInstance, int nCmdShow, int width, int height)
 {
-	WinApp::getSingletonPtr()->create(hInstance, nCmdShow, width, height, "Render PipeLine");
+	WinApp::getSingletonPtr()->Create(hInstance, nCmdShow, width, height, "Render PipeLine");
 
-	RenderDevice::getSingletonPtr()->initRenderDevice(WinApp::getSingletonPtr()->getHwnd(), width, height);
+	RenderDevice::getSingletonPtr()->InitRenderDevice(WinApp::getSingletonPtr()->GetHwnd(), width, height);
 }
 
-void Engine::destroy()
+void Engine::Destroy()
 {
 
 }
 
-void Engine::update(float dt)
+void Engine::Update(float dt)
 {
-	RenderDevice::getSingletonPtr()->renderBegin();
+	RenderDevice::getSingletonPtr()->RenderBegin();
 
-	renderScene();
+	RenderScene();
 
-	RenderDevice::getSingletonPtr()->renderBuffer();
+	RenderDevice::getSingletonPtr()->RenderBuffer();
 
-	RenderDevice::getSingletonPtr()->renderEnd();
+	RenderDevice::getSingletonPtr()->RenderEnd();
 }
 
-void Engine::renderScene()
+void Engine::RenderScene()
 {
 	DWORD color = (255 << 24) + (255 << 16) + (255 << 8) + 255;
 

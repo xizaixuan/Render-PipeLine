@@ -20,30 +20,30 @@ Camera::~Camera()
 {
 }
 
-void Camera::setParams(float lfov, float laspect, float lznear, float lzfar)
+void Camera::SetParams(float fov, float aspect, float znear, float zfar)
 {
-	m_Fov	= lfov;
-	m_Aspect= laspect;
-	m_ZNear	= lznear;
-	m_ZFar	= lzfar;
+	m_Fov	= fov;
+	m_Aspect= aspect;
+	m_ZNear	= znear;
+	m_ZFar	= zfar;
 
-	buildPerspectiveMatrix();
+	BuildPerspectiveMatrix();
 }
 
-void Camera::setParams(float3 position, float3 target)
+void Camera::SetParams(float3 position, float3 target)
 {
 	this->m_Position = position;
 	this->m_Target = target;
 
-	buildViewMatrix();
+	BuildViewMatrix();
 }
 
-void Camera::buildViewMatrix()
+void Camera::BuildViewMatrix()
 {
-	// Transform Mat = (MatR * MatT)-1
+	//Transform Mat = (MatR * MatT)-1
 	float3 dir = m_Target - m_Position;
 
-	if (MathUtil::Length(dir) <= MathUtil::EPSILON && MathUtil::Length(dir) >= -MathUtil::EPSILON)
+	if (MathUtil::Length(dir) <= MathUtil::epsilon && MathUtil::Length(dir) >= -MathUtil::epsilon)
 	{
 
 	}
@@ -60,16 +60,16 @@ void Camera::buildViewMatrix()
 	//matT.setTranslate(m_Position);
 
 	Matrix matR(
-		m_Right.x,	m_Right.y,	m_Right.z,	0.0f,
-		m_Up.x,		m_Up.y,		m_Up.z,		0.0f,
-		m_Forward.x,	m_Forward.y,	m_Forward.z,	0.0f,
-		0.0f,		0.0f,		0.0f,		1.0f);
+		float4(m_Right.x, m_Right.y, m_Right.z, 0.0f), 
+		float4(m_Up.x, m_Up.y, m_Up.z, 0.0f),
+		float4(m_Forward.x, m_Forward.y, m_Forward.z, 0.0f),
+		float4(0.0f, 0.0f, 0.0f, 1.0f));
 
 	Matrix invView = matR*matT;
-	m_View = MathUtil::inverse(invView);
+	m_View = MathUtil::Inverse(invView);
 }
 
-void Camera::buildPerspectiveMatrix()
+void Camera::BuildPerspectiveMatrix()
 {
 	float N = m_ZNear;
 	float F = m_ZFar;
@@ -82,10 +82,10 @@ void Camera::buildPerspectiveMatrix()
 	float b = -N*F / (F - N);
 
 	m_Proj.set(
-		2.0f*N/W,	0.0f,		0.0f,	0.0f,
-		0.0f,		2.0f*N/H,	0.0f,	0.0f,
-		0.0f,		0.0f,		a,		1.0f,
-		0.0f,		0.0f,	    b,		0.0f);
+		float4(2.0f*N / W,	0.0f,		0.0f,	0.0f),
+		float4(0.0f,		2.0f*N / H, 0.0f,	0.0f),
+		float4(0.0f,		0.0f,		a,		1.0f),
+		float4(0.0f,		0.0f,		b,		0.0f));
 }
 
 Matrix Camera::GetViewMatrix()

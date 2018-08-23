@@ -9,40 +9,40 @@ WinApp::~WinApp()
 {
 }
 
-void WinApp::create(HINSTANCE hInstance, int nCmdShow, int width, int height, LPSTR caption)
+void WinApp::Create(HINSTANCE hInstance, int nCmdShow, int width, int height, LPSTR caption)
 {
 	m_Width		= width;
 	m_Height		= height;
 	m_Caption	= caption;
 
-	registerClass(hInstance);
+	RegisterClass(hInstance);
 
-	init(hInstance,nCmdShow);
+	Init(hInstance,nCmdShow);
 }
 
-int	WinApp::getWidth()
+int	WinApp::GetWidth()
 {
 	return m_Width;
 }
 
-int	WinApp::getHeight()
+int	WinApp::GetHeight()
 {
 	return m_Height;
 }
 
-HWND WinApp::getHwnd()
+HWND WinApp::GetHwnd()
 {
 	return m_HWND;
 }
 
-WORD WinApp::registerClass(HINSTANCE hInstance)
+WORD WinApp::RegisterClass(HINSTANCE hInstance)
 {
 	WNDCLASSEX wcex;
 
 	wcex.cbSize = sizeof(WNDCLASSEX); 
 
 	wcex.style			= CS_HREDRAW | CS_VREDRAW;
-	wcex.lpfnWndProc	= (WNDPROC)WinApp::wndProc;
+	wcex.lpfnWndProc	= (WNDPROC)WinApp::WndProc;
 	wcex.cbClsExtra		= 0;
 	wcex.cbWndExtra		= 0;
 	wcex.hInstance		= hInstance;
@@ -56,7 +56,7 @@ WORD WinApp::registerClass(HINSTANCE hInstance)
 	return RegisterClassEx(&wcex);
 }
 
-bool WinApp::init(HINSTANCE hInstance, int nCmdShow)
+bool WinApp::Init(HINSTANCE hInstance, int nCmdShow)
 {
 	m_HWND = CreateWindow(
 		m_Caption, 
@@ -79,7 +79,7 @@ bool WinApp::init(HINSTANCE hInstance, int nCmdShow)
 	return true;
 }
 
-LRESULT CALLBACK  WinApp::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK  WinApp::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg) 
 	{

@@ -19,18 +19,17 @@ public:
 	/// \brief 析构函数
 	~Camera();
 
-	/// \brief 更新透视参数
-	void setParams(float fov, float aspect, float znear, float zfar);
+	/// \brief 设置透视参数
+	void SetParams(float fov, float aspect, float znear, float zfar);
 
-	/// \brief 更新相机位置及观察目标位置
-	void setParams(float3 position, float3 target);
+	/// \brief 设置相机位置及观察目标位置
+	void SetParams(float3 position, float3 target);
 
 	/// \brief 建立视矩阵
-	void buildViewMatrix();
+	void BuildViewMatrix();
 
 	/// \brief 建立透视矩阵
-	void buildPerspectiveMatrix();
-
+	void BuildPerspectiveMatrix();
 
 	/// \brief 获取视矩阵
 	Matrix GetViewMatrix();

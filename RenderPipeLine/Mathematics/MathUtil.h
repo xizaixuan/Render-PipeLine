@@ -16,8 +16,8 @@
 
 namespace MathUtil
 {
-	const float EPSILON = std::numeric_limits<float>::epsilon();
-	const float PI = ((float)3.141592654f);
+	const float epsilon = std::numeric_limits<float>::epsilon();
+	const float pi = 3.141592654f;
 
 	float AngelToRadian(float ang);
 	float RadianToAngel(float rads);
@@ -39,7 +39,7 @@ namespace MathUtil
 	/// brief 比较两个浮点数是否相等
 	bool IsEqual(float a, float b);
 
-	Matrix inverse(Matrix mat);
+	Matrix Inverse(Matrix mat);
 }
 
 #endif

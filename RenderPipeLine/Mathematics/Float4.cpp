@@ -1,14 +1,6 @@
 #include "Float4.h"
 #include "Matrix.h"
 
-Float4::Float4(float _x, float _y, float _z)
-	: x(_x)
-	, y(_y)
-	, z(_z)
-	, w(1.0f)
-{
-}
-
 Float4::Float4(float _x, float _y, float _z, float _w)
 	: x(_x)
 	, y(_y)
@@ -36,16 +28,6 @@ Float4& Float4::operator = (const Float4& a)
 	w = a.w;
 
 	return *this;
-}
-
-Float4 Float4::operator +(const Float4& a) const
-{
-	return Float4( x+a.x, y+a.y, z+a.z );
-}
-
-Float4 Float4::operator -(const Float4& a) const
-{
-	return Float4( x-a.x, y-a.y, z-a.z );
 }
 
 Float4 Float4::operator *(float a) const

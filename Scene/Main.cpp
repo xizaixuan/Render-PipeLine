@@ -8,7 +8,7 @@ int	WINAPI	WinMain(	IN HINSTANCE hInstance,
 						IN int nCmdShow)
 {
 	// 初始化
-	Engine::getSingletonPtr()->init(hInstance, nCmdShow, 1024, 768);
+	Engine::getSingletonPtr()->Init(hInstance, nCmdShow, 1024, 768);
 
 	// 计时器
 	__int64 cntsPerSec = 0;
@@ -35,14 +35,14 @@ int	WINAPI	WinMain(	IN HINSTANCE hInstance,
 			float dt = (currTimeStamp - prevTimeStamp)*secsPerCnt;
 
 			// 更新
-			Engine::getSingletonPtr()->update(dt);
+			Engine::getSingletonPtr()->Update(dt);
 
 			prevTimeStamp = currTimeStamp;
 		}
 	}
 
 	// 销毁
-	Engine::getSingletonPtr()->destroy();
+	Engine::getSingletonPtr()->Destroy();
 
 	return (int) msg.wParam;
 }

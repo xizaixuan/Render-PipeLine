@@ -20,7 +20,7 @@ void PipeLine::drawLine(float startX, float startY, float endX, float endY, DWOR
 
 		for (int i = 0; i < steps; i++)
 		{
-			RenderDevice::getSingletonPtr()->drawPixel(std::round(xi), std::round(yi), color);
+			RenderDevice::getSingletonPtr()->DrawPixel(std::round(xi), std::round(yi), color);
 
 			xi += increx;
 			yi += increy;
@@ -46,7 +46,7 @@ void PipeLine::drawLine(float startX, float startY, float endX, float endY, DWOR
 		{
 			for (; xi != std::round(endX); xi += ux)
 			{
-				RenderDevice::getSingletonPtr()->drawPixel(xi, yi, color);
+				RenderDevice::getSingletonPtr()->DrawPixel(xi, yi, color);
 				eps += dy;
 				if ((eps << 1) >= dx)
 				{
@@ -59,7 +59,7 @@ void PipeLine::drawLine(float startX, float startY, float endX, float endY, DWOR
 		{
 			for (; yi != std::round(endY); yi += uy)
 			{
-				RenderDevice::getSingletonPtr()->drawPixel(xi, yi, color);
+				RenderDevice::getSingletonPtr()->DrawPixel(xi, yi, color);
 				eps += dx;
 				if ((eps << 1) >= dy)
 				{

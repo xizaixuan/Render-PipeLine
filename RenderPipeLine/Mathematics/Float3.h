@@ -9,7 +9,7 @@
 
 #define  float3 Float3
 
-class Float3
+struct Float3
 {
 public:
 	/// \brief 参数构造函数

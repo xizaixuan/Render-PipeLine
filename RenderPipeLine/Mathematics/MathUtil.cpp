@@ -2,12 +2,12 @@
 
 float MathUtil::AngelToRadian(float ang)
 {
-	return ((ang)*PI / 180.0f);
+	return ((ang)*pi / 180.0f);
 }
 
 float MathUtil::RadianToAngel(float rads)
 {
-	return ((rads)*180.0f / PI);
+	return ((rads)*180.0f / pi);
 }
 
 float MathUtil::Length(const float2& v)
@@ -31,7 +31,7 @@ float2 MathUtil::Normalize(float2& v)
 	float length = Length(v);
 
 	//¼ì²é³ýÁã
-	if (length > EPSILON)
+	if (length > epsilon)
 	{
 		float lengthInv = 1.0f / length;
 
@@ -48,7 +48,7 @@ float3 MathUtil::Normalize(float3& v)
 	float length = Length(v);
 
 	//¼ì²é³ýÁã
-	if (length > EPSILON)
+	if (length > epsilon)
 	{
 		float lengthInv = 1.0f / length;
 
@@ -66,7 +66,7 @@ float4 MathUtil::Normalize(float4& v)
 	float length = Length(v);
 
 	//¼ì²é³ýÁã
-	if (length > EPSILON)
+	if (length > epsilon)
 	{
 		float lengthInv = 1.0f / length;
 
@@ -95,42 +95,42 @@ float3 MathUtil::Cross(const float3& a, const float3& b)
 
 bool MathUtil::IsEqual(float a, float b)
 {
-	return (fabs(a - b) <= EPSILON);
+	return (fabs(a - b) <= epsilon);
 }
 
-Matrix MathUtil::inverse(Matrix mat)
+Matrix MathUtil::Inverse(Matrix mat)
 {
 	Matrix imat;
 
 	float det = (
-		mat.m[0][0] * (mat.m[1][1] * mat.m[2][2] - mat.m[1][2] * mat.m[2][1]) -
-		mat.m[0][1] * (mat.m[1][0] * mat.m[2][2] - mat.m[1][2] * mat.m[2][0]) +
-		mat.m[0][2] * (mat.m[1][0] * mat.m[2][1] - mat.m[1][1] * mat.m[2][0]));
+		mat.r0.x * (mat.r1.y * mat.r2.z - mat.r1.z * mat.r2.y) -
+		mat.r0.y * (mat.r1.x * mat.r2.z - mat.r1.z * mat.r2.x) +
+		mat.r0.z * (mat.r1.x * mat.r2.y - mat.r1.y * mat.r2.x));
 
 	// ¼ì²é³ýÁã
-	if (fabs(det) > MathUtil::EPSILON)
+	if (fabs(det) > MathUtil::epsilon)
 	{
 		float det_inv = 1.0f / det;
 
-		imat.m[0][0] = det_inv * (mat.m[1][1] * mat.m[2][2] - mat.m[1][2] * mat.m[2][1]);
-		imat.m[0][1] =-det_inv * (mat.m[0][1] * mat.m[2][2] - mat.m[0][2] * mat.m[2][1]);
-		imat.m[0][2] = det_inv * (mat.m[0][1] * mat.m[1][2] - mat.m[0][2] * mat.m[1][1]);
-		imat.m[0][3] = 0.0f;
+		imat.r0.x = det_inv * (mat.r1.y * mat.r2.z - mat.r1.z * mat.r2.y);
+		imat.r0.y =-det_inv * (mat.r0.y * mat.r2.z - mat.r0.z * mat.r2.y);
+		imat.r0.z = det_inv * (mat.r0.y * mat.r1.z - mat.r0.z * mat.r1.y);
+		imat.r0.w = 0.0f;
 
-		imat.m[1][0] =-det_inv * (mat.m[1][0] * mat.m[2][2] - mat.m[1][2] * mat.m[2][0]);
-		imat.m[1][1] = det_inv * (mat.m[0][0] * mat.m[2][2] - mat.m[0][2] * mat.m[2][0]);
-		imat.m[1][2] =-det_inv * (mat.m[0][0] * mat.m[1][2] - mat.m[0][2] * mat.m[1][0]);
-		imat.m[1][3] = 0.0f;
+		imat.r1.x =-det_inv * (mat.r1.x * mat.r2.z - mat.r1.z * mat.r2.x);
+		imat.r1.y = det_inv * (mat.r0.x * mat.r2.z - mat.r0.z * mat.r2.x);
+		imat.r1.z =-det_inv * (mat.r0.x * mat.r1.z - mat.r0.z * mat.r1.x);
+		imat.r1.w = 0.0f;
 
-		imat.m[2][0] = det_inv * (mat.m[1][0] * mat.m[2][1] - mat.m[1][1] * mat.m[2][0]);
-		imat.m[2][1] =-det_inv * (mat.m[0][0] * mat.m[2][1] - mat.m[0][1] * mat.m[2][0]);
-		imat.m[2][2] = det_inv * (mat.m[0][0] * mat.m[1][1] - mat.m[0][1] * mat.m[1][0]);
-		imat.m[2][3] = 0.0f;
+		imat.r2.x = det_inv * (mat.r1.x * mat.r2.y - mat.r1.y * mat.r2.x);
+		imat.r2.y =-det_inv * (mat.r0.x * mat.r2.y - mat.r0.y * mat.r2.x);
+		imat.r2.z = det_inv * (mat.r0.x * mat.r1.y - mat.r0.y * mat.r1.x);
+		imat.r2.w = 0.0f;
 
-		imat.m[3][0] = -(mat.m[3][0] * mat.m[0][0] + mat.m[3][1] * mat.m[1][0] + mat.m[3][2] * mat.m[2][0]);
-		imat.m[3][1] = -(mat.m[3][0] * mat.m[0][1] + mat.m[3][1] * mat.m[1][1] + mat.m[3][2] * mat.m[2][1]);
-		imat.m[3][2] = -(mat.m[3][0] * mat.m[0][2] + mat.m[3][1] * mat.m[1][2] + mat.m[3][2] * mat.m[2][2]);
-		imat.m[3][3] = 1.0f;
+		imat.r3.x = -(mat.r3.x * mat.r0.x + mat.r3.y * mat.r1.x + mat.r3.z * mat.r2.x);
+		imat.r3.y = -(mat.r3.x * mat.r0.y + mat.r3.y * mat.r1.y + mat.r3.z * mat.r2.y);
+		imat.r3.z = -(mat.r3.x * mat.r0.z + mat.r3.y * mat.r1.z + mat.r3.z * mat.r2.z);
+		imat.r3.w = 1.0f;
 	}
 
 	return mat;

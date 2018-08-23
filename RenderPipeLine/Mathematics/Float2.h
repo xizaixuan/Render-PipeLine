@@ -9,7 +9,7 @@
 
 #define  float2 Float2
 
-class Float2
+struct Float2
 {
 public:
 	/// \brief 参数构造函数

@@ -9,7 +9,7 @@
 
 #include "Float4.h"
 
-class Matrix
+struct Matrix
 {
 public:
 	/// \brief 默认构造函数

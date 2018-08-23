@@ -19,16 +19,16 @@ private:
 
 public:
 	/// \brief 初始化
-	void init(HINSTANCE hInstance, int nCmdShow, int width, int height);
+	void Init(HINSTANCE hInstance, int nCmdShow, int width, int height);
 
 	/// \brief 资源销毁
-	void destroy();
+	void Destroy();
 
 	/// \brief 更新
-	void update(float dt);
+	void Update(float dt);
 
 	/// \brief 渲染场景
-	void renderScene();
+	void RenderScene();
 };
 
 #endif

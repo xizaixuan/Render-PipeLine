@@ -19,26 +19,26 @@ private:
 
 public:
 	/// \brief 创建窗口
-	void	create(HINSTANCE hInstance, int nCmdShow, int width, int height, LPSTR caption);	
+	void	Create(HINSTANCE hInstance, int nCmdShow, int width, int height, LPSTR caption);	
 
 	/// \brief 获取窗口的宽
-	int		getWidth();
+	int		GetWidth();
 
 	/// \brief 获取窗口的长
-	int		getHeight();
+	int		GetHeight();
 
 	/// \brief 获取窗口句柄
-	HWND	getHwnd();
+	HWND	GetHwnd();
 
 private:
 	/// \brief 窗口注册
-	WORD	registerClass(HINSTANCE hInstance);
+	WORD	RegisterClass(HINSTANCE hInstance);
 
 	/// \brief 初始化
-	bool	init(HINSTANCE hInstance, int nCmdShow);
+	bool	Init(HINSTANCE hInstance, int nCmdShow);
 
 	/// \brief 消息回调函数
-	static	LRESULT CALLBACK  wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+	static	LRESULT CALLBACK  WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	///	窗口名称
 	LPSTR	m_Caption;
