@@ -8,6 +8,14 @@ Float4::Float4(float _x, float _y, float _z, float _w)
 	, w(_w)
 {}
 
+Float4::Float4(const Float3& value, float w)
+	: x(value.x)
+	, y(value.y)
+	, z(value.z)
+	, w(w)
+{
+}
+
 Float4::Float4(const Float4& a)
 	: x(a.x)
 	, y(a.y)

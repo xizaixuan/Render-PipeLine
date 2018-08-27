@@ -93,6 +93,15 @@ float3 MathUtil::Cross(const float3& a, const float3& b)
 		a.x*b.y - a.y*b.x);
 }
 
+float4 MathUtil::Homogenous(float4 & value)
+{
+	value.x /= value.w;
+	value.y /= value.w;
+	value.z /= value.w;
+	value.w = 1.0f;
+	return value;
+}
+
 bool MathUtil::IsEqual(float a, float b)
 {
 	return (fabs(a - b) <= epsilon);
@@ -127,11 +136,11 @@ Matrix MathUtil::Inverse(Matrix mat)
 		imat.r2.z = det_inv * (mat.r0.x * mat.r1.y - mat.r0.y * mat.r1.x);
 		imat.r2.w = 0.0f;
 
-		imat.r3.x = -(mat.r3.x * mat.r0.x + mat.r3.y * mat.r1.x + mat.r3.z * mat.r2.x);
-		imat.r3.y = -(mat.r3.x * mat.r0.y + mat.r3.y * mat.r1.y + mat.r3.z * mat.r2.y);
-		imat.r3.z = -(mat.r3.x * mat.r0.z + mat.r3.y * mat.r1.z + mat.r3.z * mat.r2.z);
+		imat.r3.x = -(mat.r3.x * imat.r0.x + mat.r3.y * imat.r1.x + mat.r3.z * imat.r2.x);
+		imat.r3.y = -(mat.r3.x * imat.r0.y + mat.r3.y * imat.r1.y + mat.r3.z * imat.r2.y);
+		imat.r3.z = -(mat.r3.x * imat.r0.z + mat.r3.y * imat.r1.z + mat.r3.z * imat.r2.z);
 		imat.r3.w = 1.0f;
 	}
 
-	return mat;
+	return imat;
 }

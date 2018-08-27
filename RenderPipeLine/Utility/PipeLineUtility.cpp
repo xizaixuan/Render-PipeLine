@@ -1,7 +1,13 @@
 #include "PipeLineUtility.h"
 #include "..\Framework\RenderDevice.h"
+#include "..\Mathematics\Matrix.h"
+#include "..\Framework\Camera.h"
+#include "..\Mathematics\MathUtil.h"
+#include "..\Mathematics\Float4.h"
 
-void PipeLine::drawLine(float startX, float startY, float endX, float endY, DWORD color, DrawLineType type)
+Matrix RenderPipeLine::m_ViewPortMatrix;
+
+void RenderPipeLine::DrawLine(float startX, float startY, float endX, float endY, DWORD color, DrawLineType type)
 {
 	switch (type)
 	{
@@ -74,4 +80,48 @@ void PipeLine::drawLine(float startX, float startY, float endX, float endY, DWOR
 		break;
 	}
 	
+}
+
+void RenderPipeLine::PipeLine(Camera* camera, vector<float3> vertices, vector<int> indices)
+{
+	auto viewMat = camera->GetViewMatrix();
+	auto projMat = camera->GetPerspectiveMatrix();
+	auto vp = viewMat*projMat;
+
+	int indexLength = indices.size();
+	for (int index = 0; index < indexLength; index +=3 )
+	{
+		auto v0 = float4(vertices[indices[index + 0]], 1.0f);
+		auto v1 = float4(vertices[indices[index + 1]], 1.0f);
+		auto v2 = float4(vertices[indices[index + 2]], 1.0f);
+
+		v0 = v0 * vp;
+		v1 = v1 * vp;
+		v2 = v2 * vp;
+
+		v0 = MathUtil::Homogenous(v0);
+		v1 = MathUtil::Homogenous(v1);
+		v2 = MathUtil::Homogenous(v2);
+
+		v0 = v0 * m_ViewPortMatrix;
+		v1 = v1 * m_ViewPortMatrix;
+		v2 = v2 * m_ViewPortMatrix;
+
+		DWORD color = (255 << 24) + (255 << 16) + (255 << 8) + 255;
+		DrawLine(v0.x, v0.y, v1.x, v1.y, color, DrawLineType::DDA);
+		DrawLine(v0.x, v0.y, v2.x, v2.y, color, DrawLineType::DDA);
+		DrawLine(v1.x, v1.y, v2.x, v2.y, color, DrawLineType::DDA);
+	}
+}
+
+void RenderPipeLine::SetViewPortData(int width, int height)
+{
+	float alpha = (0.5f * width - 0.5f);
+	float beta = (0.5f * height - 0.5f);
+
+	m_ViewPortMatrix = Matrix(
+		float4(alpha,	0.0f,	0.0f,	0.0f),
+		float4(0.0f,   -beta,	0.0f,	0.0f),
+		float4(0.0f,	0.0f,	1.0f,	0.0f),
+		float4(alpha,	beta,	0.0f,	1.0f));
 }

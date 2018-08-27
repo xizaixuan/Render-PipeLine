@@ -12,8 +12,8 @@ Camera::Camera()
 	, m_Up(0.0f, 0.0f, 0.0f)
 	, m_Right(0.0f, 0.0f, 0.0f)
 {
-	m_View.identity();
-	m_Proj.identity();
+	m_View.Identity();
+	m_Proj.Identity();
 }
 
 Camera::~Camera()
@@ -56,14 +56,14 @@ void Camera::BuildViewMatrix()
 	m_Up = MathUtil::Normalize(MathUtil::Cross(m_Forward, m_Right));
 
 	Matrix matT;
-	matT.identity();
-	//matT.setTranslate(m_Position);
+	matT.Identity();
+	matT.Position(m_Position);
 
 	Matrix matR(
-		float4(m_Right.x, m_Right.y, m_Right.z, 0.0f), 
-		float4(m_Up.x, m_Up.y, m_Up.z, 0.0f),
-		float4(m_Forward.x, m_Forward.y, m_Forward.z, 0.0f),
-		float4(0.0f, 0.0f, 0.0f, 1.0f));
+		float4(m_Right.x,	m_Right.y,		m_Right.z,		0.0f), 
+		float4(m_Up.x,		m_Up.y,			m_Up.z,			0.0f),
+		float4(m_Forward.x, m_Forward.y,	m_Forward.z,	0.0f),
+		float4(0.0f,		0.0f,			0.0f,			1.0f));
 
 	Matrix invView = matR*matT;
 	m_View = MathUtil::Inverse(invView);
@@ -81,7 +81,7 @@ void Camera::BuildPerspectiveMatrix()
 	float a = F / (F - N);
 	float b = -N*F / (F - N);
 
-	m_Proj.set(
+	m_Proj = Matrix(
 		float4(2.0f*N / W,	0.0f,		0.0f,	0.0f),
 		float4(0.0f,		2.0f*N / H, 0.0f,	0.0f),
 		float4(0.0f,		0.0f,		a,		1.0f),

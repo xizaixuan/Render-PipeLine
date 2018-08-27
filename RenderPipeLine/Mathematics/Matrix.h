@@ -30,10 +30,9 @@ public:
 
 public:
 	/// \brief 置为单位矩阵
-	void identity();
+	void Identity();
 
-	/// \brief 设置参数
-	void set(float4 row0, float4 row1, float4 row2, float4 row3);
+	void Position(float3 position);
 
 public:
 	float4 r0;

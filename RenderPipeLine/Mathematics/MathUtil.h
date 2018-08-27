@@ -36,6 +36,8 @@ namespace MathUtil
 	float2 Cross(const float2& a, const float2& b);
 	float3 Cross(const float3& a, const float3& b);
 
+	float4 Homogenous(float4& value);
+
 	/// brief 比较两个浮点数是否相等
 	bool IsEqual(float a, float b);
 

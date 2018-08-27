@@ -6,7 +6,12 @@
 /////////////////////////////////////////////////////////////////////////////////
 #include <windows.h>
 #include <cstdlib>
-#include<algorithm>
+#include <algorithm>
+#include <vector>
+#include "..\Mathematics\Float3.h"
+#include "..\Mathematics\Matrix.h"
+
+using namespace std;
 
 #ifndef PipeLineUtility_H_
 #define PipeLineUtility_H_
@@ -15,17 +20,25 @@
 #define SAFE_DELETE(P) if(P != nullptr){delete P; P = nullptr;}
 #define SAFE_DELETE_ARRAY(P) if(P != nullptr){delete[] P; P = nullptr;}
 
+class Camera;
+
 enum DrawLineType
 {
 	DDA,
 	Bresenham,
 };
 
-class PipeLine
+class RenderPipeLine
 {
 public:
 	/// brief ªÊ÷∆÷±œﬂ
-	static void drawLine(float startX, float startY, float endX, float endY, DWORD color, DrawLineType type);
+	static void DrawLine(float startX, float startY, float endX, float endY, DWORD color, DrawLineType type);
+
+	static void PipeLine(Camera* camera, vector<float3> vertices, vector<int> indices);
+
+	static void SetViewPortData(int width, int height);
+
+	static Matrix m_ViewPortMatrix;
 };
 
 #endif

@@ -7,6 +7,8 @@
 #ifndef _Float4_H_
 #define _Float4_H_
 
+#include "Float3.h"
+
 #define  float4 Float4
 struct Matrix;
 
@@ -15,6 +17,7 @@ struct Float4
 public:
 	/// \brief 参数构造函数
 	Float4(float x, float y, float z, float w);
+	Float4(const Float3& value, float w);
 
 	/// \brief 复制构造函数
 	Float4(const Float4& a);
