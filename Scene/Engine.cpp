@@ -3,9 +3,15 @@
 #include "..\RenderPipeLine\Framework\RenderDevice.h"
 #include "..\RenderPipeLine\Utility\PipeLineUtility.h"
 #include "..\RenderPipeLine\Framework\Camera.h"
+#include <windowsx.h>
+#include "..\RenderPipeLine\Mathematics\MathUtil.h"
 
 Engine::Engine()
 	: m_pCamera(nullptr)
+	, m_Theta(0.1f)
+	, m_Phi(0.1f)
+	, m_Radius(8.0f)
+	, m_LastMousePos(0.0f, 0.0f)
 {
 }
 
@@ -43,7 +49,11 @@ void Engine::Update(float dt)
 
 void Engine::RenderScene()
 {
-	m_pCamera->SetParams(Float3(100,100,100), float3(0,0,0));
+	float x = m_Radius * sinf(m_Phi)*cosf(m_Theta);
+	float z = m_Radius * sinf(m_Phi)*sinf(m_Theta);
+	float y = m_Radius * cosf(m_Phi);
+
+	m_pCamera->SetParams(Float3(x, y, z), float3(0,0,0));
 	m_pCamera->BuildViewMatrix();
 	m_pCamera->BuildPerspectiveMatrix();
 
@@ -85,4 +95,35 @@ void Engine::RenderScene()
 	};
 
 	RenderPipeLine::PipeLine(m_pCamera, vertices, indices);
+}
+
+void Engine::OnMouseMove(WPARAM btnState, int x, int y)
+{
+	if ((btnState & MK_LBUTTON) != 0)
+	{
+		float dx = MathUtil::AngelToRadian(0.25f*static_cast<float>(x - m_LastMousePos.x));
+		float dy = MathUtil::AngelToRadian(0.25f*static_cast<float>(y - m_LastMousePos.y));
+
+		// Update angles based on input to orbit camera around box.
+		m_Theta += dx;
+		m_Phi += dy;
+
+		// Restrict the angle mPhi.
+		m_Phi = MathUtil::Clamp(m_Phi, 0.1f, MathUtil::pi - 0.1f);
+	}
+	else if ((btnState & MK_RBUTTON) != 0)
+	{
+		// Make each pixel correspond to 0.005 unit in the scene.
+		float dx = 0.005f*static_cast<float>(x - m_LastMousePos.x);
+		float dy = 0.005f*static_cast<float>(y - m_LastMousePos.y);
+
+		// Update the camera radius based on input.
+		m_Radius += dx - dy;
+
+		// Restrict the radius.
+		m_Radius = MathUtil::Clamp(m_Radius, 3.0f, 15.0f);
+	}
+
+	m_LastMousePos.x = static_cast<float>(x);
+	m_LastMousePos.y = static_cast<float>(y);
 }

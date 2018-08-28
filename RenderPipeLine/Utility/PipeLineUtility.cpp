@@ -26,7 +26,7 @@ void RenderPipeLine::DrawLine(float startX, float startY, float endX, float endY
 
 		for (int i = 0; i < steps; i++)
 		{
-			RenderDevice::getSingletonPtr()->DrawPixel(std::round(xi), std::round(yi), color);
+			RenderDevice::getSingletonPtr()->DrawPixel(std::lround(xi), std::lround(yi), color);
 
 			xi += increx;
 			yi += increy;
@@ -35,16 +35,16 @@ void RenderPipeLine::DrawLine(float startX, float startY, float endX, float endY
 	break;
 	case Bresenham:
 	{
-		int dx = endX - startX;
-		int dy = endY - startY;
+		int dx = static_cast<int>(endX - startX);
+		int dy = static_cast<int>(endY - startY);
 
 		int ux = (dx > 0) ? 1 : -1;
 		int uy = (dy > 0) ? 1 : -1;
 
-		int xi = startX;
-		int yi = startY;
+		int xi = static_cast<int>(startX);
+		int yi = static_cast<int>(startY);
 
-		int eps = 0.0f;
+		int eps = 0;
 		dx = std::abs(dx);
 		dy = std::abs(dy);
 
@@ -86,7 +86,7 @@ void RenderPipeLine::PipeLine(Camera* camera, vector<float3> vertices, vector<in
 {
 	auto viewMat = camera->GetViewMatrix();
 	auto projMat = camera->GetPerspectiveMatrix();
-	auto vp = viewMat*projMat;
+	auto vp = viewMat * projMat;
 
 	int indexLength = indices.size();
 	for (int index = 0; index < indexLength; index +=3 )
