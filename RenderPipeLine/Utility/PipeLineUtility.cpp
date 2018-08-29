@@ -88,7 +88,7 @@ void RenderPipeLine::PipeLine(Camera* camera, vector<float3> vertices, vector<in
 	auto projMat = camera->GetPerspectiveMatrix();
 	auto vp = viewMat * projMat;
 
-	int indexLength = indices.size();
+	auto indexLength = indices.size();
 	for (int index = 0; index < indexLength; index +=3 )
 	{
 		auto v0 = float4(vertices[indices[index + 0]], 1.0f);
