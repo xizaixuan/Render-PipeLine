@@ -73,6 +73,7 @@ void RenderDevice::InitRenderDevice(HWND hWndMain,int WindowWidth,int WindowHeig
 		m_pDataBuffer = new DWORD[imgsize.width * imgsize.height];
 		memset(m_pDataBuffer, 0, imgsize.width * imgsize.height * sizeof(DWORD));
 		m_pRenderTarget->CreateBitmap(imgsize, m_pDataBuffer, pitch, &prop, &m_pBitmap);
+		m_pRenderTarget->SetDpi(96.0f, 96.0f);
 	}
 }
 

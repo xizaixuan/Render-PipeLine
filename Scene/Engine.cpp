@@ -53,19 +53,19 @@ void Engine::RenderScene()
 	float z = m_Radius * sinf(m_Phi)*sinf(m_Theta);
 	float y = m_Radius * cosf(m_Phi);
 
-	m_pCamera->SetParams(Float3(x, y, z), float3(0,0,0));
+	m_pCamera->SetParams(Float3(x, y, z), float3(0, 0, 0));
 	m_pCamera->BuildViewMatrix();
 	m_pCamera->BuildPerspectiveMatrix();
 
-	vector<float3> vertices {
+	vector<float3> vertices{
 		float3(-1.0f, -1.0f, -1.0f),
 		float3(-1.0f,  1.0f, -1.0f),
-		float3( 1.0f,  1.0f, -1.0f),
-		float3( 1.0f, -1.0f, -1.0f),
+		float3(1.0f,  1.0f, -1.0f),
+		float3(1.0f, -1.0f, -1.0f),
 		float3(-1.0f, -1.0f,  1.0f),
 		float3(-1.0f,  1.0f,  1.0f),
-		float3( 1.0f,  1.0f,  1.0f),
-		float3( 1.0f, -1.0f,  1.0f)
+		float3(1.0f,  1.0f,  1.0f),
+		float3(1.0f, -1.0f,  1.0f)
 	};
 
 	vector<int> indices = {
