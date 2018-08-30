@@ -30,7 +30,7 @@
 *.exe
 *.out
 *.app
-.vs/RenderPipeLine/v15/.suo
+*.suo
 *.db
 *.opendb
 *.ipch
@@ -39,9 +39,5 @@
 *.db-shm
 *.db-wal
 *.ilk
-Render-PipeLine/Debug/Render-PipeLine.Build.CppClean.log
 *.tlog
-Render-PipeLine/Debug/Render-PipeLine.log
-Tutorial1-Framework/Debug/Tutorial1-Framework.log
-Tutorial1-Framework/Debug/Tutorial1-Framework.Build.CppClean.log
 *.log
