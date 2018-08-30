@@ -30,7 +30,7 @@
 *.exe
 *.out
 *.app
-.vs/Render-PipeLine/v15/.suo
+.vs/RenderPipeLine/v15/.suo
 *.db
 *.opendb
 *.ipch

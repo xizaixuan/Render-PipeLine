@@ -90,6 +90,9 @@
     <Link>
       <AdditionalDependencies>d2d1.lib;dxguid.lib;renderengine.lib;libfbxsdk.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>copy ..\Library\libfbxsdk.dll ..\Debug\</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
