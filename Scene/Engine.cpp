@@ -5,6 +5,11 @@
 #include "..\RenderPipeLine\Framework\Camera.h"
 #include <windowsx.h>
 #include "..\RenderPipeLine\Mathematics\MathUtil.h"
+#include "fbxsdk.h"
+#include "FbxLoader.h"
+
+vector<float3> vertices;
+vector<int> indices;
 
 Engine::Engine()
 	: m_pCamera(nullptr)
@@ -29,6 +34,13 @@ void Engine::Init(HINSTANCE hInstance, int nCmdShow, int width, int height)
 
 	m_pCamera = new Camera();
 	m_pCamera->SetParams(60, (float)width / (float)height, 0.1f, 1000.0f);
+
+
+	//////////////////////////////////////////////////////////////////////////
+
+	const char* filename = "E:\\RenderPipeLine\\untitled.fbx";
+
+	FbxLoader::getSingletonPtr()->LoadScene(filename, vertices, indices);
 }
 
 void Engine::Destroy()
@@ -56,43 +68,6 @@ void Engine::RenderScene()
 	m_pCamera->SetParams(Float3(x, y, z), float3(0, 0, 0));
 	m_pCamera->BuildViewMatrix();
 	m_pCamera->BuildPerspectiveMatrix();
-
-	vector<float3> vertices{
-		float3(-1.0f, -1.0f, -1.0f),
-		float3(-1.0f,  1.0f, -1.0f),
-		float3(1.0f,  1.0f, -1.0f),
-		float3(1.0f, -1.0f, -1.0f),
-		float3(-1.0f, -1.0f,  1.0f),
-		float3(-1.0f,  1.0f,  1.0f),
-		float3(1.0f,  1.0f,  1.0f),
-		float3(1.0f, -1.0f,  1.0f)
-	};
-
-	vector<int> indices = {
-		// Front face.
-		0, 1, 2,
-		0, 2, 3,
-
-		// Back face.
-		4, 6, 5,
-		4, 7, 6,
-
-		// Left face.
-		4, 5, 1,
-		4, 1, 0,
-
-		// Right face.
-		3, 2, 6,
-		3, 6, 7,
-
-		// Top face.
-		1, 5, 6,
-		1, 6, 2,
-
-		// Bottom face.
-		4, 0, 3,
-		4, 3, 7,
-	};
 
 	RenderPipeLine::PipeLine(m_pCamera, vertices, indices);
 }
