@@ -1,7 +1,8 @@
 #include "FbxLoader.h"
 #include <fbxsdk/core/fbxmanager.h>
 #include <fbxsdk/core/math/fbxvector4.h>
-#include <fbxsdk/scene/geometry/fbxmesh.h>
+#include <fbxsdk/core/math/fbxaffinematrix.h>
+#include <fbxsdk/scene/geometry/fbxnode.h>
 
 #ifdef IOS_REF
 #undef  IOS_REF
@@ -54,7 +55,7 @@ void FbxLoader::Finalize()
 {
 }
 
-bool FbxLoader::LoadScene(const char * pFilename, vector<float3>& vertices, vector<int>& indices)
+bool FbxLoader::LoadScene(const char * pFilename, vector<RenderBuffer>& renderBuffer)
 {
 	int lFileMajor, lFileMinor, lFileRevision;
 	int lSDKMajor, lSDKMinor, lSDKRevision;
@@ -140,7 +141,7 @@ bool FbxLoader::LoadScene(const char * pFilename, vector<float3>& vertices, vect
 
 	if (lStatus)
 	{
-		ProcessContent(m_pFbxScene, vertices, indices);
+		ProcessContent(m_pFbxScene, renderBuffer);
 	}
 
 	if (lStatus == false && lImporter->GetStatus().GetCode() == FbxStatus::ePasswordError)
@@ -172,7 +173,7 @@ bool FbxLoader::LoadScene(const char * pFilename, vector<float3>& vertices, vect
 	return lStatus;
 }
 
-void FbxLoader::ProcessContent(FbxScene* pScene, vector<float3>& vertices, vector<int>& indices)
+void FbxLoader::ProcessContent(FbxScene* pScene, vector<RenderBuffer>& renderBuffer)
 {
 	FbxNode* lNode = pScene->GetRootNode();
 
@@ -180,12 +181,12 @@ void FbxLoader::ProcessContent(FbxScene* pScene, vector<float3>& vertices, vecto
 	{
 		for (int i = 0; i < lNode->GetChildCount(); i++)
 		{
-			ProcessContent(lNode->GetChild(i), vertices, indices);
+			ProcessContent(lNode->GetChild(i), renderBuffer);
 		}
 	}
 }
 
-void FbxLoader::ProcessContent(FbxNode* pNode, vector<float3>& vertices, vector<int>& indices)
+void FbxLoader::ProcessContent(FbxNode* pNode, vector<RenderBuffer>& renderBuffer)
 {
 	if (pNode->GetNodeAttribute() == nullptr)
 	{
@@ -205,14 +206,17 @@ void FbxLoader::ProcessContent(FbxNode* pNode, vector<float3>& vertices, vector<
 // 			break;
 
 		case FbxNodeAttribute::eMesh:
+			vector<float3> vertices;
+			vector<int> indices;
 			ProcessMesh(pNode, vertices, indices);
+			renderBuffer.push_back({ vertices, indices });
 			break;
 		}
 	}
 
 	for (int i = 0; i < pNode->GetChildCount(); i++)
 	{
-		ProcessContent(pNode->GetChild(i), vertices, indices);
+		ProcessContent(pNode->GetChild(i), renderBuffer);
 	}
 }
 
@@ -220,18 +224,28 @@ void FbxLoader::ProcessMesh(FbxNode* pNode, vector<float3>& vertices, vector<int
 {
 	FbxMesh* lMesh = (FbxMesh*)pNode->GetNodeAttribute();
 
-	ProcessControlsPoints(lMesh, vertices);	// vertices			
-	ProcessPolygons(lMesh, indices);		// indices
+	auto position = pNode->GetGeometricTranslation(FbxNode::eSourcePivot);
+	auto rotation = pNode->GetGeometricRotation(FbxNode::eSourcePivot);
+	auto scale = pNode->GetGeometricScaling(FbxNode::eSourcePivot);
+
+	auto geometricTransform = FbxAMatrix(position, rotation, scale);
+	auto globalTransform = pNode->EvaluateGlobalTransform(0.0f);
+	auto tranformMat = geometricTransform * globalTransform;
+
+	ProcessControlsPoints(lMesh, vertices, tranformMat);	// vertices			
+	ProcessPolygons(lMesh, indices);						// indices
 
 }
 
-void FbxLoader::ProcessControlsPoints(FbxMesh* pMesh, vector<float3>& vertices)
+void FbxLoader::ProcessControlsPoints(FbxMesh* pMesh, vector<float3>& vertices, FbxAMatrix mat)
 {
 	int lControlPointsCount = pMesh->GetControlPointsCount();
 	FbxVector4* lControlPoints = pMesh->GetControlPoints();
+
 	for (int i = 0; i < lControlPointsCount; i++)
 	{
-		vertices.push_back(float3(lControlPoints[i].mData[0], lControlPoints[i].mData[1], lControlPoints[i].mData[2]));
+		auto newVertex = mat.MultT(lControlPoints[i]);
+		vertices.push_back(float3(newVertex.mData[0], newVertex.mData[1], newVertex.mData[2]));
 	}
 }
 
@@ -241,12 +255,21 @@ void FbxLoader::ProcessPolygons(FbxMesh* pMesh, vector<int>& indices)
 
 	for (int i = 0; i < lPolygonCount; i++)
 	{
+		int lPolygonSize = pMesh->GetPolygonSize(i);
+
 		indices.push_back(pMesh->GetPolygonVertex(i, 0));
 		indices.push_back(pMesh->GetPolygonVertex(i, 1));
 		indices.push_back(pMesh->GetPolygonVertex(i, 2));
-
-		indices.push_back(pMesh->GetPolygonVertex(i, 0));
-		indices.push_back(pMesh->GetPolygonVertex(i, 2));
-		indices.push_back(pMesh->GetPolygonVertex(i, 3));
+		
+		if (lPolygonSize == 4)
+		{
+			indices.push_back(pMesh->GetPolygonVertex(i, 0));
+			indices.push_back(pMesh->GetPolygonVertex(i, 2));
+			indices.push_back(pMesh->GetPolygonVertex(i, 3));
+		}
+		else
+		{
+			int pause = 0;
+		}
 	} // for polygonCount
 }

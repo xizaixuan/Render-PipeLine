@@ -20,8 +20,6 @@ using namespace std;
 #define SAFE_DELETE(P) if(P != nullptr){delete P; P = nullptr;}
 #define SAFE_DELETE_ARRAY(P) if(P != nullptr){delete[] P; P = nullptr;}
 
-class Camera;
-
 enum DrawLineType
 {
 	DDA,
@@ -34,7 +32,7 @@ public:
 	/// brief ªÊ÷∆÷±œﬂ
 	static void DrawLine(float startX, float startY, float endX, float endY, DWORD color, DrawLineType type);
 
-	static void PipeLine(Camera* camera, vector<float3> vertices, vector<int> indices);
+	static void DrawCall(Matrix viewMat, Matrix projMat, vector<float3> vertices, vector<int> indices);
 
 	static void SetViewPortData(int width, int height);
 

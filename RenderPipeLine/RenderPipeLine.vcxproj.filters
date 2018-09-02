@@ -59,6 +59,9 @@
     <ClInclude Include="Mathematics\MathUtil.h">
       <Filter>Header Files\Mathematics</Filter>
     </ClInclude>
+    <ClInclude Include="Utility\RenderBuffer.h">
+      <Filter>Header Files\Utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Framework\RenderDevice.cpp">
@@ -87,6 +90,9 @@
     </ClCompile>
     <ClCompile Include="Mathematics\MathUtil.cpp">
       <Filter>Source Files\Mathematics</Filter>
+    </ClCompile>
+    <ClCompile Include="Utility\RenderBuffer.cpp">
+      <Filter>Source Files\Utility</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

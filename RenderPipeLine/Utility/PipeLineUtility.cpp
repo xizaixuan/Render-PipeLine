@@ -82,18 +82,20 @@ void RenderPipeLine::DrawLine(float startX, float startY, float endX, float endY
 	
 }
 
-void RenderPipeLine::PipeLine(Camera* camera, vector<float3> vertices, vector<int> indices)
+void RenderPipeLine::DrawCall(Matrix viewMat, Matrix projMat, vector<float3> vertices, vector<int> indices)
 {
-	auto viewMat = camera->GetViewMatrix();
-	auto projMat = camera->GetPerspectiveMatrix();
 	auto vp = viewMat * projMat;
 
 	auto indexLength = indices.size();
 	for (int index = 0; index < indexLength; index +=3 )
 	{
-		auto v0 = float4(vertices[indices[index + 0]], 1.0f);
-		auto v1 = float4(vertices[indices[index + 1]], 1.0f);
-		auto v2 = float4(vertices[indices[index + 2]], 1.0f);
+		auto index0 = indices[index + 0];
+		auto index1 = indices[index + 1];
+		auto index2 = indices[index + 2];
+
+		auto v0 = float4(vertices[index0], 1.0f);
+		auto v1 = float4(vertices[index1], 1.0f);
+		auto v2 = float4(vertices[index2], 1.0f);
 
 		v0 = v0 * vp;
 		v1 = v1 * vp;

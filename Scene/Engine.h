@@ -10,6 +10,7 @@
 #include <Windows.h>
 #include "..\RenderPipeLine\Utility\Singleton.h"
 #include "..\RenderPipeLine\Mathematics\Float2.h"
+#include "..\RenderPipeLine\Utility\RenderBuffer.h"
 
 class Camera;
 
@@ -43,6 +44,8 @@ private:
 	float m_Radius;
 
 	float2 m_LastMousePos;
+
+	vector<RenderBuffer> m_RenderBuffers;
 };
 
 #endif

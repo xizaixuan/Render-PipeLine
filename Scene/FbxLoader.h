@@ -12,6 +12,8 @@
 #include "fbxsdk.h"
 #include "../RenderPipeLine/Mathematics/Float3.h"
 #include <fbxsdk/scene/geometry/fbxmesh.h>
+#include "../RenderPipeLine/Utility/RenderBuffer.h"
+#include <fbxsdk/core/math/fbxaffinematrix.h>
 
 using namespace std;
 
@@ -26,13 +28,13 @@ private:
 	void Finalize();
 
 public:
-	bool LoadScene(const char* pFilename, vector<float3>& vertices, vector<int>& indices);
+	bool LoadScene(const char* pFilename, vector<RenderBuffer>& renderBuffer);
 
 private:
-	void ProcessContent(FbxScene* pScene, vector<float3>& vertices, vector<int>& indices);
-	void ProcessContent(FbxNode* pNode, vector<float3>& vertices, vector<int>& indices);
+	void ProcessContent(FbxScene* pScene, vector<RenderBuffer>& renderBuffer);
+	void ProcessContent(FbxNode* pNode, vector<RenderBuffer>& renderBuffer);
 	void ProcessMesh(FbxNode* pNode, vector<float3>& vertices, vector<int>& indices);
-	void ProcessControlsPoints(FbxMesh* pMesh, vector<float3>& vertices);
+	void ProcessControlsPoints(FbxMesh* pMesh, vector<float3>& vertices, FbxAMatrix mat);
 	void ProcessPolygons(FbxMesh* pMesh, vector<int>& indices);
 
 public:
