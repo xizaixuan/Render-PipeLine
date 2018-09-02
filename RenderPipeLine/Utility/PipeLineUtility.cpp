@@ -109,10 +109,214 @@ void RenderPipeLine::DrawCall(Matrix viewMat, Matrix projMat, vector<float3> ver
 		v1 = v1 * m_ViewPortMatrix;
 		v2 = v2 * m_ViewPortMatrix;
 
-		DWORD color = (255 << 24) + (255 << 16) + (255 << 8) + 255;
-		DrawLine(v0.x, v0.y, v1.x, v1.y, color, DrawLineType::DDA);
-		DrawLine(v0.x, v0.y, v2.x, v2.y, color, DrawLineType::DDA);
-		DrawLine(v1.x, v1.y, v2.x, v2.y, color, DrawLineType::DDA);
+		Rasterize(v0, v1, v2);
+
+// 		DWORD color = (255 << 24) + (255 << 16) + (255 << 8) + 255;
+// 		DrawLine(v0.x, v0.y, v1.x, v1.y, color, DrawLineType::DDA);
+// 		DrawLine(v0.x, v0.y, v2.x, v2.y, color, DrawLineType::DDA);
+// 		DrawLine(v1.x, v1.y, v2.x, v2.y, color, DrawLineType::DDA);
+	}
+}
+
+void RenderPipeLine::SplitTriangle(float4& v0, float4& v1, float4& v2, float4& v3, float4& v4, float4& v5)
+{
+	float x0 = v0.x;
+	float x1 = v1.x;
+	float x2 = v2.x;
+	float y0 = v0.y;
+	float y1 = v1.y;
+	float y2 = v2.y;
+
+	float dy1_0 = y1 - y0;
+	float dy2_0 = y2 - y0;
+	float dx2_0 = x2 - x0;
+
+	// dx(new-0)/dx(2-0) = dy(1-0)/dy(2-0) => newX = 0 + dy(1-0)/dy(2-0)*dx(2-0)
+	float newX = x0 + (dy1_0 / dy2_0)*dx2_0;
+
+	//////////////////////////////////////////////////////////////////////////
+	// 平底三角形
+	v0 = float4(x0, y0, v0.z, 1);
+	v1 = float4(newX, y1, v1.z, 1);
+	v2 = float4(x1, y1, v2.z, 1);
+
+	//////////////////////////////////////////////////////////////////////////
+	// 平顶三角形
+	v3 = float4(x1, y1, v0.z, 1);
+	v4 = float4(newX, y1, v1.z, 1);
+	v5 = float4(x2, y2, v2.z, 1);
+}
+
+void RenderPipeLine::Rasterize(float4 v0, float4 v1, float4 v2)
+{
+	// 在 y 轴上 进行排序 使 v01 <= v1 < = v2
+	if (v1.y < v0.y)
+	{
+		std::swap(v1, v0);
+	}
+
+	if (v2.y < v0.y)
+	{
+		std::swap(v2, v0);
+	}
+
+	if (v2.y < v1.y)
+	{
+		std::swap(v2, v1);
+	}
+
+	// y0 == y1 则是 平顶三角形
+	if (MathUtil::IsEqual(v0.y, v1.y))
+	{
+		if (v1.x < v0.x)
+		{
+			std::swap(v1, v0);
+		}
+
+		// 平顶三角形
+		RasterizeTopFace(v0, v1, v2);
+	}
+
+	// y1 == y2 则是平底三角形
+	else if (MathUtil::IsEqual(v1.y, v2.y))
+	{
+		if (v2.x < v1.x)
+		{
+			std::swap(v2, v1);
+		}
+
+		// 平底三角形
+		RasterizeBottomFace(v0, v1, v2);
+	}
+
+	// 任意三角形
+	else
+	{
+		float4 v3(0.0f, 0.0f, 0.0f, 0.0f);
+		float4 v4(0.0f, 0.0f, 0.0f, 0.0f);
+		float4 v5(0.0f, 0.0f, 0.0f, 0.0f);
+
+		// 分裂三角形
+		SplitTriangle(v0, v1, v2, v3, v4, v5);
+
+		// 平底三角形
+		if (v2.x < v1.x)
+		{
+			std::swap(v1, v2);
+		}
+		RasterizeBottomFace(v0, v1, v2);
+
+		// 平顶三角形
+		if (v4.x < v3.x)
+		{
+			std::swap(v4, v3);
+		}
+		RasterizeTopFace(v3, v4, v5);
+	}
+}
+
+void RenderPipeLine::RasterizeTopFace(float4 v0, float4 v1, float4 v2)
+{
+	float x0 = v0.x;
+	float y0 = v0.y;
+
+	float x1 = v1.x;
+	float y1 = v1.y;
+
+	float x2 = v2.x;
+	float y2 = v2.y;
+
+	// 检测三角形是否退出为直线
+	if (((x0 == x1) && (x1 == x2)) || ((y0 == y1) && (y1 == y2)))
+		return;
+
+	// 计算三角形的高
+	float dy = (y2 - y0);
+
+	float inv_dy = 1.0f / dy;
+
+	// 计算左斜边x积分
+	float dxdyl = (x2 - x0) * inv_dy;
+
+	// 计算右斜边x积分
+	float dxdyr = (x2 - x1) * inv_dy;
+
+	// 设置扫描线起点x及终点x
+	float xstart = x0;
+	float xend = x1;
+
+	// 设置扫描线起始y及终点y
+	float ystart = y0;
+	float yend = y2;
+
+	DWORD color = (255 << 24) + (255 << 16) + (255 << 8) + 255;
+
+	for (float yi = ystart; yi < yend; yi++)
+	{
+		float inv_dx = 1.0f / (xend - xstart);
+
+		// 绘制扫描线
+		for (float xi = xstart; xi < xend; xi++)
+		{
+			// 绘制像素点
+			RenderDevice::getSingletonPtr()->DrawPixel(std::lround(xi), std::lround(yi), color);
+		}
+
+		//计算下一条扫描线起点及终点
+		xstart += dxdyl;
+		xend += dxdyr;
+	}
+}
+
+void RenderPipeLine::RasterizeBottomFace(float4 v0, float4 v1, float4 v2)
+{
+	float x0 = v0.x;
+	float y0 = v0.y;
+
+	float x1 = v1.x;
+	float y1 = v1.y;
+
+	float x2 = v2.x;
+	float y2 = v2.y;
+
+	// 检测三角形是否退出为直线
+	if (((x0 == x1) && (x1 == x2)) || ((y0 == y1) && (y1 == y2)))
+		return;
+
+	// 计算三角形的高
+	float dy = (y2 - y0);
+
+	float inv_dy = 1.0f / dy;
+
+	// 计算左斜边x积分
+	float dxdyl = (x1 - x0) * inv_dy;
+
+	// 计算右斜边x积分
+	float dxdyr = (x2 - x0) * inv_dy;
+
+	// 设置扫描线起点x及终点x
+	float xstart = x0;
+	float xend = x0;
+
+	// 设置扫描线起始y及终点y
+	float ystart = y0;
+	float yend = y2;
+
+	DWORD color = (255 << 24) + (255 << 16) + (255 << 8) + 255;
+
+	for (float yi = ystart; yi < yend; yi++)
+	{
+		float inv_dx = 1.0f / (xend - xstart);
+
+		// 绘制扫描线
+		for (float xi = xstart; xi < xend; xi++)
+		{
+			RenderDevice::getSingletonPtr()->DrawPixel(std::lround(xi), std::lround(yi), color);
+		}
+
+		//计算下一条扫描线起点及终点
+		xstart += dxdyl;
+		xend += dxdyr;
 	}
 }
 

@@ -34,6 +34,17 @@ public:
 
 	static void DrawCall(Matrix viewMat, Matrix projMat, vector<float3> vertices, vector<int> indices);
 
+	static void SplitTriangle(float4& v0, float4& v1, float4& v2, float4& v3, float4& v4, float4& v5);
+
+	/// \brief 光栅化
+	static void Rasterize(float4 v0, float4 v1, float4 v2);
+
+	/// \brief 光栅化: 平顶三角形
+	static void RasterizeTopFace(float4 v0, float4 v1, float4 v2);
+
+	/// \brief 光栅化: 平底三角形
+	static void RasterizeBottomFace(float4 v0, float4 v1, float4 v2);
+
 	static void SetViewPortData(int width, int height);
 
 	static Matrix m_ViewPortMatrix;
