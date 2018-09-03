@@ -16,6 +16,7 @@ using namespace std;
 struct RenderBuffer
 {
 	vector<float3>	vertices;
+	vector<float3>	normals;
 	vector<int>		indices;
 };
 

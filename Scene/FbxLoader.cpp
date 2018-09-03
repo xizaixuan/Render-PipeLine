@@ -208,8 +208,9 @@ void FbxLoader::ProcessContent(FbxNode* pNode, vector<RenderBuffer>& renderBuffe
 		case FbxNodeAttribute::eMesh:
 			vector<float3> vertices;
 			vector<int> indices;
-			ProcessMesh(pNode, vertices, indices);
-			renderBuffer.push_back({ vertices, indices });
+			vector<float3> normals;
+			ProcessMesh(pNode, vertices, indices, normals);
+			renderBuffer.push_back({ vertices, normals, indices});
 			break;
 		}
 	}
@@ -220,7 +221,7 @@ void FbxLoader::ProcessContent(FbxNode* pNode, vector<RenderBuffer>& renderBuffe
 	}
 }
 
-void FbxLoader::ProcessMesh(FbxNode* pNode, vector<float3>& vertices, vector<int>& indices)
+void FbxLoader::ProcessMesh(FbxNode* pNode, vector<float3>& vertices, vector<int>& indices, vector<float3>& normals)
 {
 	FbxMesh* lMesh = (FbxMesh*)pNode->GetNodeAttribute();
 
@@ -232,12 +233,12 @@ void FbxLoader::ProcessMesh(FbxNode* pNode, vector<float3>& vertices, vector<int
 	auto globalTransform = pNode->EvaluateGlobalTransform(0.0f);
 	auto tranformMat = geometricTransform * globalTransform;
 
-	ProcessControlsPoints(lMesh, vertices, tranformMat);	// vertices			
-	ProcessPolygons(lMesh, indices);						// indices
-
+	ProcessVertex(lMesh, vertices, tranformMat);	// vertices			
+	ProcessIndex(lMesh, indices);					// indices
+	ProcessNormals(lMesh, normals, tranformMat);
 }
 
-void FbxLoader::ProcessControlsPoints(FbxMesh* pMesh, vector<float3>& vertices, FbxAMatrix mat)
+void FbxLoader::ProcessVertex(FbxMesh* pMesh, vector<float3>& vertices, FbxAMatrix mat)
 {
 	int lControlPointsCount = pMesh->GetControlPointsCount();
 	FbxVector4* lControlPoints = pMesh->GetControlPoints();
@@ -249,27 +250,68 @@ void FbxLoader::ProcessControlsPoints(FbxMesh* pMesh, vector<float3>& vertices, 
 	}
 }
 
-void FbxLoader::ProcessPolygons(FbxMesh* pMesh, vector<int>& indices)
+void FbxLoader::ProcessIndex(FbxMesh* pMesh, vector<int>& indices)
 {
 	int lPolygonCount = pMesh->GetPolygonCount();
-
+	
 	for (int i = 0; i < lPolygonCount; i++)
 	{
 		int lPolygonSize = pMesh->GetPolygonSize(i);
 
-		indices.push_back(pMesh->GetPolygonVertex(i, 0));
-		indices.push_back(pMesh->GetPolygonVertex(i, 1));
-		indices.push_back(pMesh->GetPolygonVertex(i, 2));
-		
-		if (lPolygonSize == 4)
+		for (int j=0;j< lPolygonSize; j++)
 		{
-			indices.push_back(pMesh->GetPolygonVertex(i, 0));
-			indices.push_back(pMesh->GetPolygonVertex(i, 2));
-			indices.push_back(pMesh->GetPolygonVertex(i, 3));
+			indices.push_back(pMesh->GetPolygonVertex(i, j));
 		}
-		else
+	}
+}
+
+void FbxLoader::ProcessNormals(FbxMesh* pMesh, vector<float3>& normals, FbxAMatrix mat)
+{
+	FbxGeometryElementNormal* lNormalElement = pMesh->GetElementNormal();
+	if (lNormalElement)
+	{
+		if (lNormalElement->GetMappingMode() == FbxGeometryElement::eByControlPoint)
 		{
-			int pause = 0;
+			for (int lVertexIndex = 0; lVertexIndex < pMesh->GetControlPointsCount(); lVertexIndex++)
+			{
+				int lNormalIndex = 0;
+				if (lNormalElement->GetReferenceMode() == FbxGeometryElement::eDirect)
+					lNormalIndex = lVertexIndex;
+
+				if (lNormalElement->GetReferenceMode() == FbxGeometryElement::eIndexToDirect)
+					lNormalIndex = lNormalElement->GetIndexArray().GetAt(lVertexIndex);
+
+				FbxVector4 lNormal = lNormalElement->GetDirectArray().GetAt(lNormalIndex);
+				auto newNormal = mat.MultT(lNormal);
+				normals.push_back(float3(newNormal.mData[0], newNormal.mData[1], newNormal.mData[2]));
+			}
 		}
-	} // for polygonCount
+
+		else if (lNormalElement->GetMappingMode() == FbxGeometryElement::eByPolygonVertex)
+		{
+			int lIndexByPolygonVertex = 0;
+
+			for (int lPolygonIndex = 0; lPolygonIndex < pMesh->GetPolygonCount(); lPolygonIndex++)
+			{
+				int lPolygonSize = pMesh->GetPolygonSize(lPolygonIndex);
+
+				for (int i = 0; i < lPolygonSize; i++)
+				{
+					int lNormalIndex = 0;
+
+					if (lNormalElement->GetReferenceMode() == FbxGeometryElement::eDirect)
+						lNormalIndex = lIndexByPolygonVertex;
+
+					if (lNormalElement->GetReferenceMode() == FbxGeometryElement::eIndexToDirect)
+						lNormalIndex = lNormalElement->GetIndexArray().GetAt(lIndexByPolygonVertex);
+
+					FbxVector4 lNormal = lNormalElement->GetDirectArray().GetAt(lNormalIndex);
+					auto newNormal = mat.MultT(lNormal);
+					normals.push_back(float3(newNormal.mData[0], newNormal.mData[1], newNormal.mData[2]));
+
+					lIndexByPolygonVertex++;
+				}
+			}
+		}
+	}
 }

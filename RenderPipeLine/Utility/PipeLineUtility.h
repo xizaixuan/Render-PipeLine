@@ -47,6 +47,7 @@ public:
 
 	static void SetViewPortData(int width, int height);
 
+private:
 	static Matrix m_ViewPortMatrix;
 };
 
