@@ -195,7 +195,7 @@ void RenderPipeLine::Rasterize(tuple<float4> v0, tuple<float4> v1, tuple<float4>
 		}
 
 		// 光栅化三角形
-		//RasterizeFace(position0, position1, position2);
+		RasterizeFace(position0, position1, position2);
 	}
 
 	// 任意三角形
@@ -346,30 +346,31 @@ void RenderPipeLine::RasterizeFace(float4 v0, float4 v1, float4 v2)
 	if (MathUtil::IsEqual(x0, x1) && MathUtil::IsEqual(x1, x2) || MathUtil::IsEqual(y0, y1) && MathUtil::IsEqual(y1, y2))
 		return;
 
-	bool isBottomFace = y0 < y2;
-
-	// 计算三角形的高
-	float dy = (isBottomFace ? y0 - y2 : y2 - y0);
-
-	float invdy = 1.0f / dy;
-
-	// 计算左斜边x积分
-	float dxdyl = (x1 - x0) * invdy;
-
-	// 计算右斜边x积分
-	float dxdyr = (x2 - x0) * invdy;
-
 	// 设置扫描线起点x及终点x
 	float xstart = x1;
 	float xend = x2;
 
 	// 设置扫描线起始y及终点y
-	float ystart = isBottomFace ? y2 : y0;
-	float yend = isBottomFace ? y0 : y2;
+	float ystart = y2;
+	float yend = y0;
+
+	// 计算三角形的高
+	float dy = std::abs(yend - ystart);
+	int idy = std::lround(dy);
+	float ddy = (yend - ystart) / idy;
+
+	float invdy = 1.0f / dy;
+
+	// 计算左斜边x积分
+	float dxdyl = (x0 - x1) * invdy;
+
+	// 计算右斜边x积分
+	float dxdyr = (x0 - x2) * invdy;
 
 	DWORD color = (255 << 24) + (255 << 16) + (255 << 8) + 255;
 
-	for (float yi = ystart; yi < yend; yi++)
+	float yi = ystart;
+	for (int i = 0; i < idy; i++)
 	{
 		float invdx = 1.0f / (xend - xstart);
 
@@ -383,6 +384,7 @@ void RenderPipeLine::RasterizeFace(float4 v0, float4 v1, float4 v2)
 		//计算下一条扫描线起点及终点
 		xstart += dxdyl;
 		xend += dxdyr;
+		yi += ddy;
 	}
 }
 
