@@ -37,7 +37,7 @@ public:
 	static void SplitTriangle(float4& v0, float4& v1, float4& v2, float4& v3, float4& v4, float4& v5);
 
 	/// \brief 光栅化
-	static void Rasterize(float4 v0, float4 v1, float4 v2);
+	static void Rasterize(tuple<float4> v0, tuple<float4> v1, tuple<float4> v2);
 
 	/// \brief 光栅化: 平顶三角形
 	static void RasterizeTopFace(float4 v0, float4 v1, float4 v2);

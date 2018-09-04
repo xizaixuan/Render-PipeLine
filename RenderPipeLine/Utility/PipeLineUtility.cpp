@@ -4,6 +4,9 @@
 #include "..\Framework\Camera.h"
 #include "..\Mathematics\MathUtil.h"
 #include "..\Mathematics\Float4.h"
+#include <tuple>
+#include <functional>
+using namespace std;
 
 Matrix RenderPipeLine::m_ViewPortMatrix;
 
@@ -109,7 +112,7 @@ void RenderPipeLine::DrawCall(Matrix viewMat, Matrix projMat, vector<float3> ver
 		v1 = v1 * m_ViewPortMatrix;
 		v2 = v2 * m_ViewPortMatrix;
 
-		Rasterize(v0, v1, v2);
+		Rasterize(tuple<float4>(v0), tuple<float4>(v1), tuple<float4>(v2));
 
 // 		DWORD color = (255 << 24) + (255 << 16) + (255 << 8) + 255;
 // 		DrawLine(v0.x, v0.y, v1.x, v1.y, color, DrawLineType::DDA);
@@ -147,46 +150,50 @@ void RenderPipeLine::SplitTriangle(float4& v0, float4& v1, float4& v2, float4& v
 	v5 = float4(x2, y2, v2.z, 1);
 }
 
-void RenderPipeLine::Rasterize(float4 v0, float4 v1, float4 v2)
+void RenderPipeLine::Rasterize(tuple<float4> v0, tuple<float4> v1, tuple<float4> v2)
 {
+	auto position0 = ref(get<0>(v0));
+	auto position1 = ref(get<0>(v1));
+	auto positoin2 = ref(get<0>(v2));
+
 	// 在 y 轴上 进行排序 使 v01 <= v1 < = v2
-	if (v1.y < v0.y)
+	if (position1.get().y < position0.get().y)
 	{
 		std::swap(v1, v0);
 	}
 
-	if (v2.y < v0.y)
+	if (positoin2.get().y < position0.get().y)
 	{
 		std::swap(v2, v0);
 	}
 
-	if (v2.y < v1.y)
+	if (positoin2.get().y < position1.get().y)
 	{
 		std::swap(v2, v1);
 	}
 
 	// y0 == y1 则是 平顶三角形
-	if (MathUtil::IsEqual(v0.y, v1.y))
+	if (MathUtil::IsEqual(position0.get().y, position1.get().y))
 	{
-		if (v1.x < v0.x)
+		if (position1.get().x < position0.get().x)
 		{
 			std::swap(v1, v0);
 		}
 
 		// 平顶三角形
-		RasterizeTopFace(v0, v1, v2);
+		RasterizeTopFace(position0, position1, positoin2);
 	}
 
 	// y1 == y2 则是平底三角形
-	else if (MathUtil::IsEqual(v1.y, v2.y))
+	else if (MathUtil::IsEqual(position1.get().y, positoin2.get().y))
 	{
-		if (v2.x < v1.x)
+		if (positoin2.get().x < position1.get().x)
 		{
 			std::swap(v2, v1);
 		}
 
 		// 平底三角形
-		RasterizeBottomFace(v0, v1, v2);
+		RasterizeBottomFace(position0, position1, positoin2);
 	}
 
 	// 任意三角形
@@ -197,14 +204,16 @@ void RenderPipeLine::Rasterize(float4 v0, float4 v1, float4 v2)
 		float4 v5(0.0f, 0.0f, 0.0f, 0.0f);
 
 		// 分裂三角形
-		SplitTriangle(v0, v1, v2, v3, v4, v5);
+		SplitTriangle(position0, position1, positoin2, v3, v4, v5);
 
 		// 平底三角形
-		if (v2.x < v1.x)
+		if (positoin2.get().x < position1.get().x)
 		{
-			std::swap(v1, v2);
+			//std::swap(position1, positoin2);
+			std::swap(v2, v1);
+
 		}
-		RasterizeBottomFace(v0, v1, v2);
+		RasterizeBottomFace(position0, position1, positoin2);
 
 		// 平顶三角形
 		if (v4.x < v3.x)
