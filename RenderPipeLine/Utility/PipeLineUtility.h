@@ -34,7 +34,7 @@ public:
 
 	static void DrawCall(Matrix viewMat, Matrix projMat, vector<float3> vertices, vector<int> indices);
 
-	static void SplitTriangle(float4& v0, float4& v1, float4& v2, float4& v3, float4& v4, float4& v5);
+	static vector<tuple<float4>> SplitTriangle(tuple<float4> v0, tuple<float4> v1, tuple<float4> v2);
 
 	/// \brief π‚’§ªØ
 	static void Rasterize(tuple<float4> v0, tuple<float4> v1, tuple<float4> v2);
