@@ -40,7 +40,7 @@ public:
 	static void Rasterize(tuple<float4> v0, tuple<float4> v1, tuple<float4> v2);
 
 	/// \brief 光栅化, v1和v2的y相等 且 v1.x < v2.x
-	static void RasterizeFace(float4 v0, float4 v1, float4 v2);
+	static void RasterizeFace(tuple<float4> v0, tuple<float4> v1, tuple<float4> v2);
 
 	static void SetViewPortData(int width, int height);
 
