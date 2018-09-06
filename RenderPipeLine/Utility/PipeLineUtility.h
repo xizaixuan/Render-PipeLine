@@ -37,9 +37,8 @@ public:
 	static vector<tuple<float4>> SplitTriangle(tuple<float4> v0, tuple<float4> v1, tuple<float4> v2);
 
 	/// \brief 光栅化
-	static void Rasterize(tuple<float4> v0, tuple<float4> v1, tuple<float4> v2);
-	static void RasterizeBarycentric(tuple<float4> v0, tuple<float4> v1, tuple<float4> v2);
-	static bool CalcWeight(float x, float y, float& a, float& b, float& c, tuple<float4> v0, tuple<float4> v1, tuple<float4> v2, float slope0, float slope1, float slope2);
+	static void Rasterize_Standard(tuple<float4> v0, tuple<float4> v1, tuple<float4> v2);
+	static void Rasterize_Barycentric(tuple<float4> v0, tuple<float4> v1, tuple<float4> v2);
 
 	/// \brief 光栅化, v1和v2的y相等 且 v1.x < v2.x
 	static void RasterizeFace(tuple<float4> v0, tuple<float4> v1, tuple<float4> v2);

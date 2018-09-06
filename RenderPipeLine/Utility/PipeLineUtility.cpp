@@ -112,7 +112,7 @@ void RenderPipeLine::DrawCall(Matrix viewMat, Matrix projMat, vector<float3> ver
 		v1 = v1 * m_ViewPortMatrix;
 		v2 = v2 * m_ViewPortMatrix;
 
-		RasterizeBarycentric(tuple<float4>(v0), tuple<float4>(v1), tuple<float4>(v2));
+		Rasterize_Barycentric(tuple<float4>(v0), tuple<float4>(v1), tuple<float4>(v2));
 		//Rasterize(tuple<float4>(v0), tuple<float4>(v1), tuple<float4>(v2));
 
 // 		DWORD color = (255 << 24) + (255 << 16) + (255 << 8) + 255;
@@ -159,7 +159,7 @@ vector<tuple<float4>> RenderPipeLine::SplitTriangle(tuple<float4> v0, tuple<floa
 	return vertices;
 }
 
-void RenderPipeLine::Rasterize(tuple<float4> v0, tuple<float4> v1, tuple<float4> v2)
+void RenderPipeLine::Rasterize_Standard(tuple<float4> v0, tuple<float4> v1, tuple<float4> v2)
 {
 	auto position0 = ref(get<0>(v0));
 	auto position1 = ref(get<0>(v1));
@@ -216,45 +216,38 @@ void RenderPipeLine::Rasterize(tuple<float4> v0, tuple<float4> v1, tuple<float4>
 		for (int i=0;i<vertices.size();i+=3)
 		{
 			// 光栅化三角形
-			Rasterize(vertices[i + 0], vertices[i + 1], vertices[i + 2]);
+			Rasterize_Standard(vertices[i + 0], vertices[i + 1], vertices[i + 2]);
 		}
 	}
 }
 
-void RenderPipeLine::RasterizeBarycentric(tuple<float4> v0, tuple<float4> v1, tuple<float4> v2)
+void RenderPipeLine::Rasterize_Barycentric(tuple<float4> v0, tuple<float4> v1, tuple<float4> v2)
 {
-	float x0 = get<0>(v0).x;
-	float y0 = get<0>(v0).y;
-
-	float x1 = get<0>(v1).x;
-	float y1 = get<0>(v1).y;
-
-	float x2 = get<0>(v2).x;
-	float y2 = get<0>(v2).y;
-
-	// 计算斜率
-	//f01（x，y） = （y0 - y1） * x + （x1 - x0） * y + x0 * y1 - x1 * y0
-	//f12（x，y） = （y1 - y2） * x + （x2 - x1） * y + x1 * y2 - x2 * y1
-	//f20（x，y） = （y2 - y0） * x + （x0 - x2） * y + x2 * y0 - x0 * y2
-
-	auto slope0 = (y0 - y1) * x2 + (x1 - x0) * y2 + x0 * y1 - x1 * y0;
-	auto slope1 = (y1 - y2) * x0 + (x2 - x1) * y0 + x1 * y2 - x2 * y1;
-	auto slope2 = (y2 - y0) * x1 + (x0 - x2) * y1 + x2 * y0 - x0 * y2;
-
-	// 不绘制计算结果斜率为0的三角形
-	if (MathUtil::IsEqual(abs(slope0), 0.0f) || MathUtil::IsEqual(abs(slope1), 0.0f) || MathUtil::IsEqual(abs(slope2), 0.0f))
+	auto edgeFunction = [](const float4& a, const float4& b, const float4& c)
 	{
-		return;
-	}
+		return (c.x - a.x) * (b.y - a.y) - (c.y - a.y) * (b.x - a.x);
+	};
 
-	auto invSlope0 = 1.0f / slope0;
-	auto invSlope1 = 1.0f / slope1;
-	auto invSlope2 = 1.0f / slope2;
+	auto boundMin = [](const float& a, const float& b, const float& c)
+	{
+		return min(min(a, b), min(a, c));
+	};
 
-	int xMin = lround((x0 < x1 ? x0 : x1) < x2 ? (x0 < x1 ? x0 : x1) : x2);
-	int xMax = lround((x0 > x1 ? x0 : x1) > x2 ? (x0 > x1 ? x0 : x1) : x2);
-	int yMin = lround((y0 < y1 ? y0 : y1) < y2 ? (y0 < y1 ? y0 : y1) : y2);
-	int yMax = lround((y0 > y1 ? y0 : y1) > y2 ? (y0 > y1 ? y0 : y1) : y2);
+	auto boundMax = [](const float& a, const float& b, const float& c)
+	{
+		return max(max(a, b), max(a, c));
+	};
+
+	float4 position0 = get<0>(v0);
+	float4 position1 = get<0>(v1);
+	float4 position2 = get<0>(v2);
+
+	float area = edgeFunction(position0, position1, position2);
+
+	int xMin = boundMin(position0.x, position1.x, position2.x);
+	int xMax = boundMax(position0.x, position1.x, position2.x);
+	int yMin = boundMin(position0.y, position1.y, position2.y);
+	int yMax = boundMax(position0.y, position1.y, position2.y);
 
 	DWORD color = (255 << 24) + (255 << 16) + (255 << 8) + 255;
 
@@ -262,41 +255,23 @@ void RenderPipeLine::RasterizeBarycentric(tuple<float4> v0, tuple<float4> v1, tu
 	{
 		for (int y = yMin; y <= yMax; ++y)
 		{
-			float a = 1.0f / 3.0f;
-			float b = 1.0f / 3.0f;
-			float c = 1.0f / 3.0f;
+			float4 p(x + 0.5f, y + 0.5f, 0.0f, 0.0f);
 
-			if (CalcWeight(x, y, a, b, c, v0, v1, v2, invSlope0, invSlope1, invSlope2))
+			float w0 = edgeFunction(position1, position2, p);
+			float w1 = edgeFunction(position2, position0, p);
+			float w2 = edgeFunction(position0, position1, p);
+
+			if (w0 >= 0 && w1 >= 0 && w2 >= 0)
 			{
+				w0 /= area;
+				w1 /= area;
+				w2 /= area;
+
 				// 绘制像素点
 				RenderDevice::getSingletonPtr()->DrawPixel(std::lround(x), std::lround(y), color);
 			}
 		}
 	}
-}
-
-bool RenderPipeLine::CalcWeight(
-	float x, float y,
-	float& a, float& b, float& c, 
-	tuple<float4> v0, tuple<float4> v1, tuple<float4> v2,
-	float slope0, float slope1, float slope2)
-{
-	float x0 = get<0>(v0).x;
-	float y0 = get<0>(v0).y;
-
-	float x1 = get<0>(v1).x;
-	float y1 = get<0>(v1).y;
-
-	float x2 = get<0>(v2).x;
-	float y2 = get<0>(v2).y;
-
-	// 计算权重
-	a = ((y1 - y2) * x + (x2 - x1) * y + x1 * y2 - x2 * y1) * slope1;
-	b = ((y2 - y0) * x + (x0 - x2) * y + x2 * y0 - x0 * y2) * slope2;
-	c = ((y0 - y1) * x + (x1 - x0) * y + x0 * y1 - x1 * y0) * slope0;
-
-	// 判断是否在三角形内
-	return a >= 0.0f && a >= 0.0f &&a >= 0.0f;
 }
 
 void RenderPipeLine::RasterizeFace(tuple<float4> v0, tuple<float4> v1, tuple<float4> v2)
