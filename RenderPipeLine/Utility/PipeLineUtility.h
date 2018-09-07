@@ -34,14 +34,12 @@ public:
 
 	static void DrawCall(Matrix viewMat, Matrix projMat, vector<float3> vertices, vector<int> indices);
 
-	static vector<tuple<float4>> SplitTriangle(tuple<float4> v0, tuple<float4> v1, tuple<float4> v2);
-
 	/// \brief 光栅化
 	static void Rasterize_Standard(tuple<float4> v0, tuple<float4> v1, tuple<float4> v2);
+	static vector<tuple<float4>> SplitTriangle_Standard(tuple<float4> v0, tuple<float4> v1, tuple<float4> v2);
+	static void RasterizeFace_Standard(tuple<float4> v0, tuple<float4> v1, tuple<float4> v2);
 	static void Rasterize_Barycentric(tuple<float4> v0, tuple<float4> v1, tuple<float4> v2);
-
-	/// \brief 光栅化, v1和v2的y相等 且 v1.x < v2.x
-	static void RasterizeFace(tuple<float4> v0, tuple<float4> v1, tuple<float4> v2);
+	
 
 	static void SetViewPortData(int width, int height);
 

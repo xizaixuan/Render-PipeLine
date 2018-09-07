@@ -122,7 +122,69 @@ void RenderPipeLine::DrawCall(Matrix viewMat, Matrix projMat, vector<float3> ver
 	}
 }
 
-vector<tuple<float4>> RenderPipeLine::SplitTriangle(tuple<float4> v0, tuple<float4> v1, tuple<float4> v2)
+void RenderPipeLine::Rasterize_Standard(tuple<float4> v0, tuple<float4> v1, tuple<float4> v2)
+{
+	auto position0 = ref(get<0>(v0));
+	auto position1 = ref(get<0>(v1));
+	auto position2 = ref(get<0>(v2));
+
+	// 在 y 轴上 进行排序 使 v0 <= v1 < = v2
+	if (position1.get().y < position0.get().y)
+	{
+		std::swap(v1, v0);
+	}
+
+	if (position2.get().y < position0.get().y)
+	{
+		std::swap(v2, v0);
+	}
+
+	if (position2.get().y < position1.get().y)
+	{
+		std::swap(v2, v1);
+	}
+
+	// y0 == y1 则是平底三角形
+	if (MathUtil::IsEqual(position0.get().y, position1.get().y))
+	{
+		std::swap(v2, v0);
+
+		if (position2.get().x < position1.get().x)
+		{
+			std::swap(v2, v1);
+		}
+
+		// 光栅化三角形
+		RasterizeFace_Standard(position0, position1, position2);
+	}
+
+	// y1 == y2 则是平顶三角形
+	else if (MathUtil::IsEqual(position1.get().y, position2.get().y))
+	{
+		if (position2.get().x < position1.get().x)
+		{
+			std::swap(v2, v1);
+		}
+
+		// 光栅化三角形
+		RasterizeFace_Standard(position0, position1, position2);
+	}
+
+	// 任意三角形
+	else
+	{
+		// 分裂三角形
+		auto vertices = SplitTriangle_Standard(v0, v1, v2);
+
+		for (int i = 0; i < vertices.size(); i += 3)
+		{
+			// 光栅化三角形
+			Rasterize_Standard(vertices[i + 0], vertices[i + 1], vertices[i + 2]);
+		}
+	}
+}
+
+vector<tuple<float4>> RenderPipeLine::SplitTriangle_Standard(tuple<float4> v0, tuple<float4> v1, tuple<float4> v2)
 {
 	vector<tuple<float4>> vertices;
 
@@ -159,65 +221,57 @@ vector<tuple<float4>> RenderPipeLine::SplitTriangle(tuple<float4> v0, tuple<floa
 	return vertices;
 }
 
-void RenderPipeLine::Rasterize_Standard(tuple<float4> v0, tuple<float4> v1, tuple<float4> v2)
+void RenderPipeLine::RasterizeFace_Standard(tuple<float4> v0, tuple<float4> v1, tuple<float4> v2)
 {
-	auto position0 = ref(get<0>(v0));
-	auto position1 = ref(get<0>(v1));
-	auto position2 = ref(get<0>(v2));
+	float x0 = get<0>(v0).x;
+	float y0 = get<0>(v0).y;
 
-	// 在 y 轴上 进行排序 使 v0 <= v1 < = v2
-	if (position1.get().y < position0.get().y)
+	float x1 = get<0>(v1).x;
+	float y1 = get<0>(v1).y;
+
+	float x2 = get<0>(v2).x;
+	float y2 = get<0>(v2).y;
+
+	// 检测三角形是否为直线
+	if (MathUtil::IsEqual(x0, x1) && MathUtil::IsEqual(x1, x2) || MathUtil::IsEqual(y0, y1) && MathUtil::IsEqual(y1, y2))
+		return;
+
+	// 设置扫描线起点x及终点x
+	float xstart = x1;
+	float xend = x2;
+
+	// 设置扫描线起始y及终点y
+	float ystart = y2;
+	float yend = y0;
+
+	// 计算三角形的高
+	bool topface = y0 < y2;
+	float dy = yend - ystart;
+	float ddy = dy / std::abs(dy);
+
+	float invdy = 1.0f / std::abs(dy);
+
+	// 计算左斜边x积分
+	float dxdyl = (x0 - x1) * invdy;
+
+	// 计算右斜边x积分
+	float dxdyr = (x0 - x2) * invdy;
+
+	DWORD color = (255 << 24) + (255 << 16) + (255 << 8) + 255;
+
+	for (float yi = ystart; topface ? (yi >= yend) : (yi <= yend); yi += ddy)
 	{
-		std::swap(v1, v0);
-	}
+		float invdx = 1.0f / (xend - xstart);
 
-	if (position2.get().y < position0.get().y)
-	{
-		std::swap(v2, v0);
-	}
-
-	if (position2.get().y < position1.get().y)
-	{
-		std::swap(v2, v1);
-	}
-
-	// y0 == y1 则是平底三角形
-	if (MathUtil::IsEqual(position0.get().y, position1.get().y))
-	{
-		std::swap(v2, v0);
-
-		if (position2.get().x < position1.get().x)
+		for (float xi = xstart; xi <= xend; xi++)
 		{
-			std::swap(v2, v1);
+			// 绘制像素点
+			RenderDevice::getSingletonPtr()->DrawPixel(std::lround(xi), std::lround(yi), color);
 		}
 
-		// 光栅化三角形
-		RasterizeFace(position0, position1, position2);
-	}
-
-	// y1 == y2 则是平顶三角形
-	else if (MathUtil::IsEqual(position1.get().y, position2.get().y))
-	{
-		if (position2.get().x < position1.get().x)
-		{
-			std::swap(v2, v1);
-		}
-
-		// 光栅化三角形
-		RasterizeFace(position0, position1, position2);
-	}
-
-	// 任意三角形
-	else
-	{
-		// 分裂三角形
-		auto vertices = SplitTriangle(v0, v1, v2);
-
-		for (int i=0;i<vertices.size();i+=3)
-		{
-			// 光栅化三角形
-			Rasterize_Standard(vertices[i + 0], vertices[i + 1], vertices[i + 2]);
-		}
+		//计算下一条扫描线起点及终点
+		xstart += dxdyl;
+		xend += dxdyr;
 	}
 }
 
@@ -271,60 +325,6 @@ void RenderPipeLine::Rasterize_Barycentric(tuple<float4> v0, tuple<float4> v1, t
 				RenderDevice::getSingletonPtr()->DrawPixel(std::lround(x), std::lround(y), color);
 			}
 		}
-	}
-}
-
-void RenderPipeLine::RasterizeFace(tuple<float4> v0, tuple<float4> v1, tuple<float4> v2)
-{
-	float x0 = get<0>(v0).x;
-	float y0 = get<0>(v0).y;
-
-	float x1 = get<0>(v1).x;
-	float y1 = get<0>(v1).y;
-
-	float x2 = get<0>(v2).x;
-	float y2 = get<0>(v2).y;
-
-	// 检测三角形是否为直线
-	if (MathUtil::IsEqual(x0, x1) && MathUtil::IsEqual(x1, x2) || MathUtil::IsEqual(y0, y1) && MathUtil::IsEqual(y1, y2))
-		return;
-
-	// 设置扫描线起点x及终点x
-	float xstart = x1;
-	float xend = x2;
-
-	// 设置扫描线起始y及终点y
-	float ystart = y2;
-	float yend = y0;
-
-	// 计算三角形的高
-	bool topface = y0 < y2;
-	float dy = yend - ystart;
-	float ddy = dy / std::abs(dy);
-
-	float invdy = 1.0f / std::abs(dy);
-
-	// 计算左斜边x积分
-	float dxdyl = (x0 - x1) * invdy;
-
-	// 计算右斜边x积分
-	float dxdyr = (x0 - x2) * invdy;
-
-	DWORD color = (255 << 24) + (255 << 16) + (255 << 8) + 255;
-
-	for (float yi = ystart; topface ? (yi >= yend) : (yi <= yend); yi += ddy)
-	{
-		float invdx = 1.0f / (xend - xstart);
-
-		for (float xi = xstart; xi <= xend; xi++)
-		{
-			// 绘制像素点
-			RenderDevice::getSingletonPtr()->DrawPixel(std::lround(xi), std::lround(yi), color);
-		}
-
-		//计算下一条扫描线起点及终点
-		xstart += dxdyl;
-		xend += dxdyr;
 	}
 }
 
