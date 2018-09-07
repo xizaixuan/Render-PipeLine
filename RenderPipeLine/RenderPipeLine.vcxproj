@@ -131,6 +131,7 @@
     <ClInclude Include="Mathematics\Matrix.h" />
     <ClInclude Include="Utility\PipeLineUtility.h" />
     <ClInclude Include="Utility\RenderBuffer.h" />
+    <ClInclude Include="Utility\RenderContext.h" />
     <ClInclude Include="Utility\Singleton.h" />
   </ItemGroup>
   <ItemGroup>
@@ -144,6 +145,7 @@
     <ClCompile Include="Mathematics\Matrix.cpp" />
     <ClCompile Include="Utility\PipeLineUtility.cpp" />
     <ClCompile Include="Utility\RenderBuffer.cpp" />
+    <ClCompile Include="Utility\RenderContext.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

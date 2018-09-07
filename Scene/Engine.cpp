@@ -7,12 +7,14 @@
 #include "..\RenderPipeLine\Mathematics\MathUtil.h"
 #include "fbxsdk.h"
 #include "FbxLoader.h"
+#include "..\RenderPipeLine\Utility\RenderContext.h"
 
 vector<float3> vertices;
 vector<int> indices;
 
 Engine::Engine()
 	: m_pCamera(nullptr)
+	, m_pRenderContext(nullptr)
 	, m_Theta(-MathUtil::pi * 0.5f)
 	, m_Phi(MathUtil::pi * 0.5f)
 	, m_Radius(800.0f)
@@ -35,10 +37,11 @@ void Engine::Init(HINSTANCE hInstance, int nCmdShow, int width, int height)
 	m_pCamera = new Camera();
 	m_pCamera->SetParams(60, (float)width / (float)height, 0.1f, 1000.0f);
 
+	m_pRenderContext = new RenderContext();
 
 	//////////////////////////////////////////////////////////////////////////
 
-	const char* filename = "E:\\RenderPipeLine\\untitled.fbx";
+	const char* filename = "D:\\ProjectZone\\RenderPipeLine\\untitled.fbx";
 
 	FbxLoader::getSingletonPtr()->LoadScene(filename, m_RenderBuffers);
 }
@@ -69,13 +72,17 @@ void Engine::RenderScene()
 	m_pCamera->BuildViewMatrix();
 	m_pCamera->BuildPerspectiveMatrix();
 
+	m_pRenderContext->CameraPosition = m_pCamera->m_Position;
+	m_pRenderContext->ViewMatrix = m_pCamera->GetViewMatrix();
+	m_pRenderContext->ProjMatrix = m_pCamera->GetPerspectiveMatrix();
+
 	for (auto buffer : m_RenderBuffers)
 	{
 		RenderPipeLine::DrawCall(
-			m_pCamera->GetViewMatrix(),
-			m_pCamera->GetPerspectiveMatrix(),
+			m_pRenderContext,
 			buffer.vertices,
-			buffer.indices);
+			buffer.indices,
+			buffer.normals);
 	}
 }
 

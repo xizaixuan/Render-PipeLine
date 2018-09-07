@@ -13,6 +13,7 @@
 #include "..\RenderPipeLine\Utility\RenderBuffer.h"
 
 class Camera;
+struct RenderContext;
 
 class Engine : public Singleton<Engine>
 {
@@ -38,6 +39,7 @@ public:
 
 private:
 	Camera* m_pCamera;
+	RenderContext* m_pRenderContext;
 
 	float m_Theta;
 	float m_Phi;

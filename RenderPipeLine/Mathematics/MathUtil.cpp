@@ -52,9 +52,9 @@ float3 MathUtil::Normalize(float3& v)
 	{
 		float lengthInv = 1.0f / length;
 
-		v.x = v.x*lengthInv;
-		v.y = v.y*lengthInv;
-		v.z = v.z*lengthInv;
+		v.x = v.x * lengthInv;
+		v.y = v.y * lengthInv;
+		v.z = v.z * lengthInv;
 	}
 
 	return v;
@@ -143,4 +143,24 @@ Matrix MathUtil::Inverse(Matrix mat)
 	}
 
 	return imat;
+}
+
+float3 MathUtil::Forward(Matrix mat)
+{
+	return Float3(mat.r2.x, mat.r2.y, mat.r2.z);
+}
+
+float3 MathUtil::Up(Matrix mat)
+{
+	return Float3(mat.r1.x, mat.r1.y, mat.r1.z);
+}
+
+float3 MathUtil::Right(Matrix mat)
+{
+	return Float3(mat.r0.x, mat.r0.y, mat.r0.z);
+}
+
+float3 MathUtil::Position(Matrix mat)
+{
+	return Float3(mat.r3.x, mat.r3.y, mat.r3.z);
 }

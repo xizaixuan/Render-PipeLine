@@ -48,6 +48,11 @@ namespace MathUtil
 	{
 		return x < low ? low : (x > high ? high : x);
 	}
+
+	float3 Forward(Matrix mat);
+	float3 Up(Matrix mat);
+	float3 Right(Matrix mat);
+	float3 Position(Matrix mat);
 }
 
 #endif

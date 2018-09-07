@@ -62,6 +62,9 @@
     <ClInclude Include="Utility\RenderBuffer.h">
       <Filter>Header Files\Utility</Filter>
     </ClInclude>
+    <ClInclude Include="Utility\RenderContext.h">
+      <Filter>Header Files\Utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Framework\RenderDevice.cpp">
@@ -92,6 +95,9 @@
       <Filter>Source Files\Mathematics</Filter>
     </ClCompile>
     <ClCompile Include="Utility\RenderBuffer.cpp">
+      <Filter>Source Files\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="Utility\RenderContext.cpp">
       <Filter>Source Files\Utility</Filter>
     </ClCompile>
   </ItemGroup>

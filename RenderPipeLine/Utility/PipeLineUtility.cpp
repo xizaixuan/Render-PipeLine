@@ -6,6 +6,7 @@
 #include "..\Mathematics\Float4.h"
 #include <tuple>
 #include <functional>
+#include "RenderContext.h"
 using namespace std;
 
 Matrix RenderPipeLine::m_ViewPortMatrix;
@@ -85,9 +86,30 @@ void RenderPipeLine::DrawLine(float startX, float startY, float endX, float endY
 	
 }
 
-void RenderPipeLine::DrawCall(Matrix viewMat, Matrix projMat, vector<float3> vertices, vector<int> indices)
+void RenderPipeLine::DrawCall(RenderContext* context, vector<float3> vertices, vector<int> indices, vector<float3> normals)
 {
-	auto vp = viewMat * projMat;
+	auto vp = context->ViewMatrix * context->ProjMatrix;
+
+	auto TriangleSetup = [](vector<float3> vertices, vector<int> indices, vector<float3> normals)
+	{
+		auto indexLength = indices.size();
+		for (int index = 0; index < indexLength; index += 3)
+		{
+			auto index0 = indices[index + 0];
+			auto index1 = indices[index + 1];
+			auto index2 = indices[index + 2];
+
+			auto normal0 = normals[index + 0];
+			auto normal1 = normals[index + 1];
+			auto normal2 = normals[index + 2];
+
+			auto position0 = vertices[index0];
+			auto position1 = vertices[index1];
+			auto position2 = vertices[index2];
+
+			auto faceNormal = MathUtil::Normalize((normal0 + normal1 + normal2) * 0.3333f);
+		}
+	};
 
 	auto indexLength = indices.size();
 	for (int index = 0; index < indexLength; index +=3 )
@@ -96,29 +118,40 @@ void RenderPipeLine::DrawCall(Matrix viewMat, Matrix projMat, vector<float3> ver
 		auto index1 = indices[index + 1];
 		auto index2 = indices[index + 2];
 
-		auto v0 = float4(vertices[index0], 1.0f);
-		auto v1 = float4(vertices[index1], 1.0f);
-		auto v2 = float4(vertices[index2], 1.0f);
+		auto normal0 = normals[index + 0];
+		auto normal1 = normals[index + 1];
+		auto normal2 = normals[index + 2];
 
-		v0 = v0 * vp;
-		v1 = v1 * vp;
-		v2 = v2 * vp;
+		auto faceNormal = MathUtil::Normalize((normal0 + normal1 + normal2) * 0.3333f);
+		auto viewDir = MathUtil::Normalize(context->CameraPosition - (vertices[index0] + vertices[index1] + vertices[index2])* 0.3333f);
+		auto dot = faceNormal * viewDir;
 
-		v0 = MathUtil::Homogenous(v0);
-		v1 = MathUtil::Homogenous(v1);
-		v2 = MathUtil::Homogenous(v2);
+		if (dot > 0.0f)
+		{
+			auto v0 = float4(vertices[index0], 1.0f);
+			auto v1 = float4(vertices[index1], 1.0f);
+			auto v2 = float4(vertices[index2], 1.0f);
 
-		v0 = v0 * m_ViewPortMatrix;
-		v1 = v1 * m_ViewPortMatrix;
-		v2 = v2 * m_ViewPortMatrix;
+			v0 = v0 * vp;
+			v1 = v1 * vp;
+			v2 = v2 * vp;
 
-		Rasterize_Barycentric(tuple<float4>(v0), tuple<float4>(v1), tuple<float4>(v2));
-		//Rasterize(tuple<float4>(v0), tuple<float4>(v1), tuple<float4>(v2));
+			v0 = MathUtil::Homogenous(v0);
+			v1 = MathUtil::Homogenous(v1);
+			v2 = MathUtil::Homogenous(v2);
 
-// 		DWORD color = (255 << 24) + (255 << 16) + (255 << 8) + 255;
-// 		DrawLine(v0.x, v0.y, v1.x, v1.y, color, DrawLineType::DDA);
-// 		DrawLine(v0.x, v0.y, v2.x, v2.y, color, DrawLineType::DDA);
-// 		DrawLine(v1.x, v1.y, v2.x, v2.y, color, DrawLineType::DDA);
+			v0 = v0 * m_ViewPortMatrix;
+			v1 = v1 * m_ViewPortMatrix;
+			v2 = v2 * m_ViewPortMatrix;
+
+			//Rasterize_Barycentric(tuple<float4>(v0), tuple<float4>(v1), tuple<float4>(v2));
+			//Rasterize_Standard(tuple<float4>(v0), tuple<float4>(v1), tuple<float4>(v2));
+
+			DWORD color = (255 << 24) + (255 << 16) + (255 << 8) + 255;
+			DrawLine(v0.x, v0.y, v1.x, v1.y, color, DrawLineType::DDA);
+			DrawLine(v0.x, v0.y, v2.x, v2.y, color, DrawLineType::DDA);
+			DrawLine(v1.x, v1.y, v2.x, v2.y, color, DrawLineType::DDA);
+		}
 	}
 }
 
@@ -298,10 +331,10 @@ void RenderPipeLine::Rasterize_Barycentric(tuple<float4> v0, tuple<float4> v1, t
 
 	float area = edgeFunction(position0, position1, position2);
 
-	int xMin = boundMin(position0.x, position1.x, position2.x);
-	int xMax = boundMax(position0.x, position1.x, position2.x);
-	int yMin = boundMin(position0.y, position1.y, position2.y);
-	int yMax = boundMax(position0.y, position1.y, position2.y);
+	int xMin = floor(boundMin(position0.x, position1.x, position2.x));
+	int xMax = ceil(boundMax(position0.x, position1.x, position2.x));
+	int yMin = floor(boundMin(position0.y, position1.y, position2.y));
+	int yMax = ceil(boundMax(position0.y, position1.y, position2.y));
 
 	DWORD color = (255 << 24) + (255 << 16) + (255 << 8) + 255;
 

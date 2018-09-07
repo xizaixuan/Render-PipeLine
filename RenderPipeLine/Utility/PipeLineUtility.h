@@ -26,13 +26,15 @@ enum DrawLineType
 	Bresenham,
 };
 
+struct RenderContext;
+
 class RenderPipeLine
 {
 public:
 	/// brief 绘制直线
 	static void DrawLine(float startX, float startY, float endX, float endY, DWORD color, DrawLineType type);
 
-	static void DrawCall(Matrix viewMat, Matrix projMat, vector<float3> vertices, vector<int> indices);
+	static void DrawCall(RenderContext* context, vector<float3> vertices, vector<int> indices, vector<float3> normals);
 
 	/// \brief 光栅化
 	static void Rasterize_Standard(tuple<float4> v0, tuple<float4> v1, tuple<float4> v2);
