@@ -41,7 +41,7 @@ void Engine::Init(HINSTANCE hInstance, int nCmdShow, int width, int height)
 
 	//////////////////////////////////////////////////////////////////////////
 
-	const char* filename = "D:\\ProjectZone\\RenderPipeLine\\untitled.fbx";
+	const char* filename = "E:\\RenderPipeLine\\untitled.fbx";
 
 	FbxLoader::getSingletonPtr()->LoadScene(filename, m_RenderBuffers);
 }
@@ -82,7 +82,8 @@ void Engine::RenderScene()
 			m_pRenderContext,
 			buffer.vertices,
 			buffer.indices,
-			buffer.normals);
+			buffer.normals,
+			buffer.colors);
 	}
 }
 

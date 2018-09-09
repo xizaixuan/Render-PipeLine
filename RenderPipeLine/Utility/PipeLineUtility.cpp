@@ -86,7 +86,7 @@ void RenderPipeLine::DrawLine(float startX, float startY, float endX, float endY
 	
 }
 
-void RenderPipeLine::DrawCall(RenderContext* context, vector<float3> vertices, vector<int> indices, vector<float3> normals)
+void RenderPipeLine::DrawCall(RenderContext* context, vector<float3> vertices, vector<int> indices, vector<float3> normals, vector<float4> colors)
 {
 	auto VertexShader = [](const vector<float3>& vertices, const Matrix& vp, vector<float4>& vertexOutPut)
 	{
@@ -145,9 +145,9 @@ void RenderPipeLine::DrawCall(RenderContext* context, vector<float3> vertices, v
 			v1 = v1 * m_ViewPortMatrix;
 			v2 = v2 * m_ViewPortMatrix;
 
-			//Rasterize_Barycentric(tuple<float4>(v0), tuple<float4>(v1), tuple<float4>(v2));
+			Rasterize_Barycentric(tuple<float4>(v0), tuple<float4>(v1), tuple<float4>(v2));
 			//Rasterize_Standard(tuple<float4>(v0), tuple<float4>(v1), tuple<float4>(v2));
-			Rasterize_WireFrame(tuple<float4>(v0), tuple<float4>(v1), tuple<float4>(v2));
+			//Rasterize_WireFrame(tuple<float4>(v0), tuple<float4>(v1), tuple<float4>(v2));
 		}
 	}
 }

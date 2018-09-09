@@ -209,8 +209,9 @@ void FbxLoader::ProcessContent(FbxNode* pNode, vector<RenderBuffer>& renderBuffe
 			vector<float3> vertices;
 			vector<int> indices;
 			vector<float3> normals;
-			ProcessMesh(pNode, vertices, indices, normals);
-			renderBuffer.push_back({ vertices, normals, indices});
+			vector<float4> colors;
+			ProcessMesh(pNode, vertices, indices, normals, colors);
+			renderBuffer.push_back({ vertices, normals, indices, colors });
 			break;
 		}
 	}
@@ -221,7 +222,7 @@ void FbxLoader::ProcessContent(FbxNode* pNode, vector<RenderBuffer>& renderBuffe
 	}
 }
 
-void FbxLoader::ProcessMesh(FbxNode* pNode, vector<float3>& vertices, vector<int>& indices, vector<float3>& normals)
+void FbxLoader::ProcessMesh(FbxNode* pNode, vector<float3>& vertices, vector<int>& indices, vector<float3>& normals, vector<float4>& colors)
 {
 	FbxMesh* lMesh = (FbxMesh*)pNode->GetNodeAttribute();
 
@@ -236,6 +237,7 @@ void FbxLoader::ProcessMesh(FbxNode* pNode, vector<float3>& vertices, vector<int
 	ProcessVertex(lMesh, vertices, tranformMat);	// vertices			
 	ProcessIndex(lMesh, indices);					// indices
 	ProcessNormals(lMesh, normals, tranformMat);
+	ProcessVertexColor(lMesh, colors);
 }
 
 void FbxLoader::ProcessVertex(FbxMesh* pMesh, vector<float3>& vertices, FbxAMatrix mat)
@@ -312,6 +314,29 @@ void FbxLoader::ProcessNormals(FbxMesh* pMesh, vector<float3>& normals, FbxAMatr
 					lIndexByPolygonVertex++;
 				}
 			}
+		}
+	}
+}
+
+void FbxLoader::ProcessVertexColor(FbxMesh* pMesh, vector<float4>& colors)
+{
+	auto vertexCount = pMesh->GetControlPointsCount();
+	for (int lVertexIndex = 0; lVertexIndex < vertexCount; lVertexIndex++)
+	{
+		FbxGeometryElementVertexColor* leVtxc = pMesh->GetElementVertexColor(0);
+
+		if (leVtxc != nullptr)
+		{
+			int lColorlIndex = 0;
+			if (leVtxc->GetReferenceMode() == FbxGeometryElement::eDirect)
+				lColorlIndex = lVertexIndex;
+
+			if (leVtxc->GetReferenceMode() == FbxGeometryElement::eIndexToDirect)
+				lColorlIndex = leVtxc->GetIndexArray().GetAt(lVertexIndex);
+
+			auto color = leVtxc->GetDirectArray().GetAt(lColorlIndex);
+
+			colors.push_back(float4(color.mRed, color.mGreen, color.mBlue, color.mAlpha));
 		}
 	}
 }

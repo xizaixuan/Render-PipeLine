@@ -14,6 +14,7 @@
 #include <fbxsdk/scene/geometry/fbxmesh.h>
 #include "../RenderPipeLine/Utility/RenderBuffer.h"
 #include <fbxsdk/core/math/fbxaffinematrix.h>
+#include "../RenderPipeLine/Mathematics/Float4.h"
 
 using namespace std;
 
@@ -33,10 +34,11 @@ public:
 private:
 	void ProcessContent(FbxScene* pScene, vector<RenderBuffer>& renderBuffer);
 	void ProcessContent(FbxNode* pNode, vector<RenderBuffer>& renderBuffer);
-	void ProcessMesh(FbxNode* pNode, vector<float3>& vertices, vector<int>& indices, vector<float3>& normals);
+	void ProcessMesh(FbxNode* pNode, vector<float3>& vertices, vector<int>& indices, vector<float3>& normals, vector<float4>& colors);
 	void ProcessVertex(FbxMesh* pMesh, vector<float3>& vertices, FbxAMatrix mat);
 	void ProcessIndex(FbxMesh* pMesh, vector<int>& indices);
 	void ProcessNormals(FbxMesh* pMesh, vector<float3>& normals, FbxAMatrix mat);
+	void ProcessVertexColor(FbxMesh* pMesh, vector<float4>& colors);
 
 public:
 	FbxManager* m_pFbxManager;

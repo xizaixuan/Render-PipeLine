@@ -7,6 +7,7 @@
 
 #include <vector>
 #include "../Mathematics/Float3.h"
+#include "../Mathematics/Float4.h"
 using namespace std;
 
 #ifndef RenderBuffer_H_
@@ -18,6 +19,7 @@ struct RenderBuffer
 	vector<float3>	vertices;
 	vector<float3>	normals;
 	vector<int>		indices;
+	vector<float4>	colors;
 };
 
 #endif
