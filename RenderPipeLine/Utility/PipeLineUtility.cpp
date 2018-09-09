@@ -88,7 +88,13 @@ void RenderPipeLine::DrawLine(float startX, float startY, float endX, float endY
 
 void RenderPipeLine::DrawCall(RenderContext* context, vector<float3> vertices, vector<int> indices, vector<float3> normals)
 {
-	auto vp = context->ViewMatrix * context->ProjMatrix;
+	auto VertexShader = [](const vector<float3>& vertices, const Matrix& vp, vector<float4>& vertexOutPut)
+	{
+		for (auto vertex : vertices)
+		{
+			vertexOutPut.push_back(float4(vertex.x, vertex.y, vertex.z, 1.0f)*vp);
+		}
+	};
 
 	auto TriangleSetup = [](vector<float3> vertices, vector<int> indices, vector<float3> normals)
 	{
@@ -111,6 +117,9 @@ void RenderPipeLine::DrawCall(RenderContext* context, vector<float3> vertices, v
 		}
 	};
 
+	auto vp = context->ViewMatrix * context->ProjMatrix;
+	vector<float4> vertexOutPut;
+	VertexShader(vertices, vp, vertexOutPut);
 	auto indexLength = indices.size();
 	for (int index = 0; index < indexLength; index +=3 )
 	{
@@ -118,24 +127,16 @@ void RenderPipeLine::DrawCall(RenderContext* context, vector<float3> vertices, v
 		auto index1 = indices[index + 1];
 		auto index2 = indices[index + 2];
 
-		auto normal0 = normals[index + 0];
-		auto normal1 = normals[index + 1];
-		auto normal2 = normals[index + 2];
+		auto v0 = vertexOutPut[index0];
+		auto v1 = vertexOutPut[index1];
+		auto v2 = vertexOutPut[index2];
 
-		auto faceNormal = MathUtil::Normalize((normal0 + normal1 + normal2) * 0.3333f);
-		auto viewDir = MathUtil::Normalize(context->CameraPosition - (vertices[index0] + vertices[index1] + vertices[index2])* 0.3333f);
-		auto dot = faceNormal * viewDir;
+		auto faceNormal = MathUtil::Cross(float3(v1.x - v0.x, v1.y - v0.y, v1.z - v0.z), float3(v2.x - v0.x, v2.y - v0.y, v2.z - v0.z));
+		auto viewDir = MathUtil::Normalize(float3(0.0f, 0.0f, 0.0f) - float3(v0.x, v0.y, v0.z));
+		auto visible = faceNormal * viewDir >= 0.0f;
 
-		if (dot > 0.0f)
+		if (visible)
 		{
-			auto v0 = float4(vertices[index0], 1.0f);
-			auto v1 = float4(vertices[index1], 1.0f);
-			auto v2 = float4(vertices[index2], 1.0f);
-
-			v0 = v0 * vp;
-			v1 = v1 * vp;
-			v2 = v2 * vp;
-
 			v0 = MathUtil::Homogenous(v0);
 			v1 = MathUtil::Homogenous(v1);
 			v2 = MathUtil::Homogenous(v2);
@@ -146,11 +147,7 @@ void RenderPipeLine::DrawCall(RenderContext* context, vector<float3> vertices, v
 
 			//Rasterize_Barycentric(tuple<float4>(v0), tuple<float4>(v1), tuple<float4>(v2));
 			//Rasterize_Standard(tuple<float4>(v0), tuple<float4>(v1), tuple<float4>(v2));
-
-			DWORD color = (255 << 24) + (255 << 16) + (255 << 8) + 255;
-			DrawLine(v0.x, v0.y, v1.x, v1.y, color, DrawLineType::DDA);
-			DrawLine(v0.x, v0.y, v2.x, v2.y, color, DrawLineType::DDA);
-			DrawLine(v1.x, v1.y, v2.x, v2.y, color, DrawLineType::DDA);
+			Rasterize_WireFrame(tuple<float4>(v0), tuple<float4>(v1), tuple<float4>(v2));
 		}
 	}
 }
@@ -359,6 +356,18 @@ void RenderPipeLine::Rasterize_Barycentric(tuple<float4> v0, tuple<float4> v1, t
 			}
 		}
 	}
+}
+
+void RenderPipeLine::Rasterize_WireFrame(tuple<float4> v0, tuple<float4> v1, tuple<float4> v2)
+{
+	float4 position0 = get<0>(v0);
+	float4 position1 = get<0>(v1);
+	float4 position2 = get<0>(v2);
+
+	DWORD color = (255 << 24) + (255 << 16) + (255 << 8) + 255;
+	DrawLine(position0.x, position0.y, position1.x, position1.y, color, DrawLineType::DDA);
+	DrawLine(position0.x, position0.y, position2.x, position2.y, color, DrawLineType::DDA);
+	DrawLine(position1.x, position1.y, position2.x, position2.y, color, DrawLineType::DDA);
 }
 
 void RenderPipeLine::SetViewPortData(int width, int height)
