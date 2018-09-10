@@ -40,7 +40,7 @@ public:
 	static void Rasterize_Standard(tuple<float4> v0, tuple<float4> v1, tuple<float4> v2);
 	static vector<tuple<float4>> SplitTriangle_Standard(tuple<float4> v0, tuple<float4> v1, tuple<float4> v2);
 	static void RasterizeFace_Standard(tuple<float4> v0, tuple<float4> v1, tuple<float4> v2);
-	static void Rasterize_Barycentric(tuple<float4> v0, tuple<float4> v1, tuple<float4> v2);
+	static void Rasterize_Barycentric(tuple<float4, float4> v0, tuple<float4, float4> v1, tuple<float4, float4> v2);
 	static void Rasterize_WireFrame(tuple<float4> v0, tuple<float4> v1, tuple<float4> v2);
 
 	static void SetViewPortData(int width, int height);

@@ -131,6 +131,10 @@ void RenderPipeLine::DrawCall(RenderContext* context, vector<float3> vertices, v
 		auto v1 = vertexOutPut[index1];
 		auto v2 = vertexOutPut[index2];
 
+		auto color0 = colors[index0];
+		auto color1 = colors[index1];
+		auto color2 = colors[index2];
+
 		auto faceNormal = MathUtil::Cross(float3(v1.x - v0.x, v1.y - v0.y, v1.z - v0.z), float3(v2.x - v0.x, v2.y - v0.y, v2.z - v0.z));
 		auto viewDir = MathUtil::Normalize(float3(0.0f, 0.0f, 0.0f) - float3(v0.x, v0.y, v0.z));
 		auto visible = faceNormal * viewDir >= 0.0f;
@@ -145,7 +149,7 @@ void RenderPipeLine::DrawCall(RenderContext* context, vector<float3> vertices, v
 			v1 = v1 * m_ViewPortMatrix;
 			v2 = v2 * m_ViewPortMatrix;
 
-			Rasterize_Barycentric(tuple<float4>(v0), tuple<float4>(v1), tuple<float4>(v2));
+			Rasterize_Barycentric(tuple<float4, float4>(v0, color0), tuple<float4, float4>(v1, color1), tuple<float4, float4>(v2, color2));
 			//Rasterize_Standard(tuple<float4>(v0), tuple<float4>(v1), tuple<float4>(v2));
 			//Rasterize_WireFrame(tuple<float4>(v0), tuple<float4>(v1), tuple<float4>(v2));
 		}
@@ -305,11 +309,11 @@ void RenderPipeLine::RasterizeFace_Standard(tuple<float4> v0, tuple<float4> v1, 
 	}
 }
 
-void RenderPipeLine::Rasterize_Barycentric(tuple<float4> v0, tuple<float4> v1, tuple<float4> v2)
+void RenderPipeLine::Rasterize_Barycentric(tuple<float4, float4> v0, tuple<float4, float4> v1, tuple<float4, float4> v2)
 {
 	auto edgeFunction = [](const float4& a, const float4& b, const float4& c)
 	{
-		return (c.x - a.x) * (b.y - a.y) - (c.y - a.y) * (b.x - a.x);
+		return (c.y - a.y) * (b.x - a.x) - (c.x - a.x) * (b.y - a.y);
 	};
 
 	auto boundMin = [](const float& a, const float& b, const float& c)
@@ -326,14 +330,16 @@ void RenderPipeLine::Rasterize_Barycentric(tuple<float4> v0, tuple<float4> v1, t
 	float4 position1 = get<0>(v1);
 	float4 position2 = get<0>(v2);
 
+	float4 color0 = get<1>(v0);
+	float4 color1 = get<1>(v1);
+	float4 color2 = get<1>(v2);
+
 	float area = edgeFunction(position0, position1, position2);
 
 	int xMin = floor(boundMin(position0.x, position1.x, position2.x));
 	int xMax = ceil(boundMax(position0.x, position1.x, position2.x));
 	int yMin = floor(boundMin(position0.y, position1.y, position2.y));
 	int yMax = ceil(boundMax(position0.y, position1.y, position2.y));
-
-	DWORD color = (255 << 24) + (255 << 16) + (255 << 8) + 255;
 
 	for (int x = xMin; x <= xMax; ++x)
 	{
@@ -350,6 +356,12 @@ void RenderPipeLine::Rasterize_Barycentric(tuple<float4> v0, tuple<float4> v1, t
 				w0 /= area;
 				w1 /= area;
 				w2 /= area;
+
+				float r = w0 * color0.x + w1 * color1.x + w2 * color2.x;
+				float g = w0 * color0.y + w1 * color1.y + w2 * color2.y;
+				float b = w0 * color0.z + w1 * color1.z + w2 * color2.z;
+
+				DWORD color = (255 << 24) + ((int)(r * 255) << 16) + ((int)(g * 255) << 8) + (int)(b * 255);
 
 				// »æÖÆÏñËØµã
 				RenderDevice::getSingletonPtr()->DrawPixel(std::lround(x), std::lround(y), color);
