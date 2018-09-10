@@ -107,6 +107,11 @@ bool MathUtil::IsEqual(float a, float b)
 	return (fabs(a - b) <= epsilon);
 }
 
+bool MathUtil::IsEqual(int a, int b)
+{
+	return (a - b) == 0;
+}
+
 Matrix MathUtil::Inverse(Matrix mat)
 {
 	Matrix imat;

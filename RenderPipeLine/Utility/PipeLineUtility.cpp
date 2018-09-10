@@ -149,8 +149,8 @@ void RenderPipeLine::DrawCall(RenderContext* context, vector<float3> vertices, v
 			v1 = v1 * m_ViewPortMatrix;
 			v2 = v2 * m_ViewPortMatrix;
 
-			Rasterize_Barycentric(tuple<float4, float4>(v0, color0), tuple<float4, float4>(v1, color1), tuple<float4, float4>(v2, color2));
-			//Rasterize_Standard(tuple<float4>(v0), tuple<float4>(v1), tuple<float4>(v2));
+			//Rasterize_Barycentric(tuple<float4, float4>(v0, color0), tuple<float4, float4>(v1, color1), tuple<float4, float4>(v2, color2));
+			Rasterize_Standard(tuple<float4>(v0), tuple<float4>(v1), tuple<float4>(v2));
 			//Rasterize_WireFrame(tuple<float4>(v0), tuple<float4>(v1), tuple<float4>(v2));
 		}
 	}
@@ -257,14 +257,14 @@ vector<tuple<float4>> RenderPipeLine::SplitTriangle_Standard(tuple<float4> v0, t
 
 void RenderPipeLine::RasterizeFace_Standard(tuple<float4> v0, tuple<float4> v1, tuple<float4> v2)
 {
-	float x0 = get<0>(v0).x;
-	float y0 = get<0>(v0).y;
+	int x0 = get<0>(v0).x;
+	int y0 = get<0>(v0).y;
 
-	float x1 = get<0>(v1).x;
-	float y1 = get<0>(v1).y;
+	int x1 = get<0>(v1).x;
+	int y1 = get<0>(v1).y;
 
-	float x2 = get<0>(v2).x;
-	float y2 = get<0>(v2).y;
+	int x2 = get<0>(v2).x;
+	int y2 = get<0>(v2).y;
 
 	// 检测三角形是否为直线
 	if (MathUtil::IsEqual(x0, x1) && MathUtil::IsEqual(x1, x2) || MathUtil::IsEqual(y0, y1) && MathUtil::IsEqual(y1, y2))
@@ -281,26 +281,21 @@ void RenderPipeLine::RasterizeFace_Standard(tuple<float4> v0, tuple<float4> v1, 
 	// 计算三角形的高
 	bool topface = y0 < y2;
 	float dy = yend - ystart;
-	float ddy = dy / std::abs(dy);
-
-	float invdy = 1.0f / std::abs(dy);
 
 	// 计算左斜边x积分
-	float dxdyl = (x0 - x1) * invdy;
+	float dxdyl = (x0 - x1) / (float)std::abs(dy);
 
 	// 计算右斜边x积分
-	float dxdyr = (x0 - x2) * invdy;
+	float dxdyr = (x0 - x2) / std::abs(dy);
 
 	DWORD color = (255 << 24) + (255 << 16) + (255 << 8) + 255;
 
-	for (float yi = ystart; topface ? (yi >= yend) : (yi <= yend); yi += ddy)
+	for (float yi = ystart; topface ? (yi >= yend) : (yi <= yend); yi += (topface ? -1 : 1))
 	{
-		float invdx = 1.0f / (xend - xstart);
-
-		for (float xi = xstart; xi <= xend; xi++)
+		for (float xi = floor(xstart); xi <= ceil(xend); xi++)
 		{
 			// 绘制像素点
-			RenderDevice::getSingletonPtr()->DrawPixel(std::lround(xi), std::lround(yi), color);
+			RenderDevice::getSingletonPtr()->DrawPixel((int)(xi + 0.5f), (int)(yi + 0.5f), color);
 		}
 
 		//计算下一条扫描线起点及终点

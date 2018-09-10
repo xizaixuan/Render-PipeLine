@@ -38,8 +38,9 @@ namespace MathUtil
 
 	float4 Homogenous(float4& value);
 
-	/// brief 比较两个浮点数是否相等
+	/// brief 比较两个数是否相等
 	bool IsEqual(float a, float b);
+	bool IsEqual(int a, int b);
 
 	Matrix Inverse(Matrix mat);
 
