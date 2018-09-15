@@ -11,8 +11,13 @@ using namespace std;
 
 Matrix RenderPipeLine::m_ViewPortMatrix;
 
-void RenderPipeLine::DrawLine(float startX, float startY, float endX, float endY, DWORD color, DrawLineType type)
+void RenderPipeLine::DrawLine(int2 position0, int2 position1, DWORD color, DrawLineType type)
 {
+	int startX	= position0.x;
+	int startY	= position0.y;
+	int endX	= position1.x;
+	int endY	= position1.y;
+
 	switch (type)
 	{
 	case DDA:
@@ -120,6 +125,12 @@ void RenderPipeLine::DrawCall(RenderContext* context, vector<float3> vertices, v
 	auto vp = context->ViewMatrix * context->ProjMatrix;
 	vector<float4> vertexOutPut;
 	VertexShader(vertices, vp, vertexOutPut);
+
+	for (auto& vertex : vertexOutPut)
+	{
+		vertex = MathUtil::Homogenous(vertex);
+	}
+
 	auto indexLength = indices.size();
 	for (int index = 0; index < indexLength; index +=3 )
 	{
@@ -141,22 +152,18 @@ void RenderPipeLine::DrawCall(RenderContext* context, vector<float3> vertices, v
 
 		if (visible)
 		{
-			v0 = MathUtil::Homogenous(v0);
-			v1 = MathUtil::Homogenous(v1);
-			v2 = MathUtil::Homogenous(v2);
-
 			v0 = v0 * m_ViewPortMatrix;
 			v1 = v1 * m_ViewPortMatrix;
 			v2 = v2 * m_ViewPortMatrix;
 
-			//Rasterize_Barycentric(tuple<float4, float4>(v0, color0), tuple<float4, float4>(v1, color1), tuple<float4, float4>(v2, color2));
-			Rasterize_Standard(tuple<float4>(v0), tuple<float4>(v1), tuple<float4>(v2));
-			//Rasterize_WireFrame(tuple<float4>(v0), tuple<float4>(v1), tuple<float4>(v2));
+			//Rasterize_Barycentric(tuple<int2, float4>(int2(v0.x, v0.y), color0), tuple<int2, float4>(int2(v1.x, v1.y), color1), tuple<int2, float4>(int2(v2.x, v2.y), color2));
+			//Rasterize_Standard(tuple<Int2>(int2(v0.x, v0.y)), tuple<Int2>(int2(v1.x, v1.y)), tuple<Int2>(int2(v2.x, v2.y)));
+			Rasterize_WireFrame(int2(v0.x, v0.y), int2(v1.x, v1.y), int2(v2.x, v2.y));
 		}
 	}
 }
 
-void RenderPipeLine::Rasterize_Standard(tuple<float4> v0, tuple<float4> v1, tuple<float4> v2)
+void RenderPipeLine::Rasterize_Standard(tuple<int2> v0, tuple<int2> v1, tuple<int2> v2)
 {
 	auto position0 = ref(get<0>(v0));
 	auto position1 = ref(get<0>(v1));
@@ -218,44 +225,41 @@ void RenderPipeLine::Rasterize_Standard(tuple<float4> v0, tuple<float4> v1, tupl
 	}
 }
 
-vector<tuple<float4>> RenderPipeLine::SplitTriangle_Standard(tuple<float4> v0, tuple<float4> v1, tuple<float4> v2)
+vector<tuple<int2>> RenderPipeLine::SplitTriangle_Standard(tuple<int2> v0, tuple<int2> v1, tuple<int2> v2)
 {
-	vector<tuple<float4>> vertices;
+	vector<tuple<int2>> vertices;
 
 	auto v3 = v0;
 	auto v4 = v1;
 	auto v5 = v2;
 
-	float4 position0 = get<0>(v0);
-	float4 position1 = get<0>(v1);
-	float4 position2 = get<0>(v2);
+	auto position0 = get<0>(v0);
+	auto position1 = get<0>(v1);
+	auto position2 = get<0>(v2);
 
 	float dy1_0 = position1.y - position0.y;
 	float dy2_0 = position2.y - position0.y;
 	float dx2_0 = position2.x - position0.x;
-	float dz1_0 = position1.z - position0.z;
-	float dz2_0 = position2.z - position0.z;
 
 	// dx(new-0)/dx(2-0) = dy(1-0)/dy(2-0) => newX = 0 + dy(1-0)/dy(2-0)*dx(2-0)
 	float newX = position0.x + (dy1_0 / dy2_0)*dx2_0;
-	float newZ = position0.z + (dy1_0 / dy2_0)*dz2_0;
 
 	//////////////////////////////////////////////////////////////////////////
 	// v0, v1, v2
 	vertices.push_back({ position0 });
 	vertices.push_back({ position1 });
-	vertices.push_back({ float4(newX, position1.y, newZ, 1) });
+	vertices.push_back({ int2(newX, position1.y) });
 
 	//////////////////////////////////////////////////////////////////////////
 	// v3, v4, v5
 	vertices.push_back({ position1 });
 	vertices.push_back({ position2 });
-	vertices.push_back({ float4(newX, position1.y, newZ, 1) });
+	vertices.push_back({ int2(newX, position1.y) });
 
 	return vertices;
 }
 
-void RenderPipeLine::RasterizeFace_Standard(tuple<float4> v0, tuple<float4> v1, tuple<float4> v2)
+void RenderPipeLine::RasterizeFace_Standard(tuple<int2> v0, tuple<int2> v1, tuple<int2> v2)
 {
 	int x0 = get<0>(v0).x;
 	int y0 = get<0>(v0).y;
@@ -270,32 +274,37 @@ void RenderPipeLine::RasterizeFace_Standard(tuple<float4> v0, tuple<float4> v1, 
 	if (MathUtil::IsEqual(x0, x1) && MathUtil::IsEqual(x1, x2) || MathUtil::IsEqual(y0, y1) && MathUtil::IsEqual(y1, y2))
 		return;
 
+	bool topface = y0 > y2;
+
 	// 设置扫描线起点x及终点x
-	float xstart = x1;
-	float xend = x2;
+	float xstart= (topface ? x1 : x0);
+	//float xend	= (topface ? x2 : x0) + 0.5f;
+	float xend = (topface ? get<0>(v2).x : get<0>(v0).x) + 0.5f;
 
 	// 设置扫描线起始y及终点y
-	float ystart = y2;
-	float yend = y0;
+	int ystart= (topface ? y2 : y0);
+	//int yend  = (topface ? y0 : y2) + 0.5f;
+	int yend = (topface ? get<0>(v0).y : get<0>(v2).y) + 0.5f;
 
 	// 计算三角形的高
-	bool topface = y0 < y2;
 	float dy = yend - ystart;
 
 	// 计算左斜边x积分
-	float dxdyl = (x0 - x1) / (float)std::abs(dy);
+	int diffXL = topface ? (x0 - x1) : (x1 - x0);
+	float dxdyl = diffXL / dy;
 
 	// 计算右斜边x积分
-	float dxdyr = (x0 - x2) / std::abs(dy);
+	int diffXR = topface ? (x0 - x2) : (x2 - x0);
+	float dxdyr = diffXR / dy;
 
 	DWORD color = (255 << 24) + (255 << 16) + (255 << 8) + 255;
 
-	for (float yi = ystart; topface ? (yi >= yend) : (yi <= yend); yi += (topface ? -1 : 1))
+	for (int yi = ystart; yi <= yend; yi++)
 	{
-		for (float xi = floor(xstart); xi <= ceil(xend); xi++)
+		for (int xi = xstart; xi <= xend; xi++)
 		{
 			// 绘制像素点
-			RenderDevice::getSingletonPtr()->DrawPixel((int)(xi + 0.5f), (int)(yi + 0.5f), color);
+			RenderDevice::getSingletonPtr()->DrawPixel(xi, yi, color);
 		}
 
 		//计算下一条扫描线起点及终点
@@ -304,32 +313,32 @@ void RenderPipeLine::RasterizeFace_Standard(tuple<float4> v0, tuple<float4> v1, 
 	}
 }
 
-void RenderPipeLine::Rasterize_Barycentric(tuple<float4, float4> v0, tuple<float4, float4> v1, tuple<float4, float4> v2)
+void RenderPipeLine::Rasterize_Barycentric(tuple<int2, float4> v0, tuple<int2, float4> v1, tuple<int2, float4> v2)
 {
-	auto edgeFunction = [](const float4& a, const float4& b, const float4& c)
+	auto edgeFunction = [](const int2& a, const int2& b, const int2& c)
 	{
 		return (c.y - a.y) * (b.x - a.x) - (c.x - a.x) * (b.y - a.y);
 	};
 
-	auto boundMin = [](const float& a, const float& b, const float& c)
+	auto boundMin = [](const int& a, const int& b, const int& c)
 	{
 		return min(min(a, b), min(a, c));
 	};
 
-	auto boundMax = [](const float& a, const float& b, const float& c)
+	auto boundMax = [](const int& a, const int& b, const int& c)
 	{
 		return max(max(a, b), max(a, c));
 	};
 
-	float4 position0 = get<0>(v0);
-	float4 position1 = get<0>(v1);
-	float4 position2 = get<0>(v2);
+	int2 position0 = get<0>(v0);
+	int2 position1 = get<0>(v1);
+	int2 position2 = get<0>(v2);
 
 	float4 color0 = get<1>(v0);
 	float4 color1 = get<1>(v1);
 	float4 color2 = get<1>(v2);
 
-	float area = edgeFunction(position0, position1, position2);
+	int area = edgeFunction(position0, position1, position2);
 
 	int xMin = floor(boundMin(position0.x, position1.x, position2.x));
 	int xMax = ceil(boundMax(position0.x, position1.x, position2.x));
@@ -340,11 +349,11 @@ void RenderPipeLine::Rasterize_Barycentric(tuple<float4, float4> v0, tuple<float
 	{
 		for (int y = yMin; y <= yMax; ++y)
 		{
-			float4 p(x + 0.5f, y + 0.5f, 0.0f, 0.0f);
+			int2 p(x, y);
 
-			float w0 = edgeFunction(position1, position2, p);
-			float w1 = edgeFunction(position2, position0, p);
-			float w2 = edgeFunction(position0, position1, p);
+			float w0 = static_cast<float>(edgeFunction(position1, position2, p));
+			float w1 = static_cast<float>(edgeFunction(position2, position0, p));
+			float w2 = static_cast<float>(edgeFunction(position0, position1, p));
 
 			if (w0 >= 0 && w1 >= 0 && w2 >= 0)
 			{
@@ -365,16 +374,12 @@ void RenderPipeLine::Rasterize_Barycentric(tuple<float4, float4> v0, tuple<float
 	}
 }
 
-void RenderPipeLine::Rasterize_WireFrame(tuple<float4> v0, tuple<float4> v1, tuple<float4> v2)
+void RenderPipeLine::Rasterize_WireFrame(int2 v0, int2 v1, int2 v2)
 {
-	float4 position0 = get<0>(v0);
-	float4 position1 = get<0>(v1);
-	float4 position2 = get<0>(v2);
-
 	DWORD color = (255 << 24) + (255 << 16) + (255 << 8) + 255;
-	DrawLine(position0.x, position0.y, position1.x, position1.y, color, DrawLineType::DDA);
-	DrawLine(position0.x, position0.y, position2.x, position2.y, color, DrawLineType::DDA);
-	DrawLine(position1.x, position1.y, position2.x, position2.y, color, DrawLineType::DDA);
+	DrawLine(v0, v1, color, DrawLineType::DDA);
+	DrawLine(v0, v2, color, DrawLineType::DDA);
+	DrawLine(v1, v2, color, DrawLineType::DDA);
 }
 
 void RenderPipeLine::SetViewPortData(int width, int height)

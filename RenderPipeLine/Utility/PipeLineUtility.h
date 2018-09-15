@@ -10,6 +10,7 @@
 #include <vector>
 #include "..\Mathematics\Float3.h"
 #include "..\Mathematics\Matrix.h"
+#include "..\Mathematics\Int2.h"
 
 using namespace std;
 
@@ -32,16 +33,16 @@ class RenderPipeLine
 {
 public:
 	/// brief 绘制直线
-	static void DrawLine(float startX, float startY, float endX, float endY, DWORD color, DrawLineType type);
+	static void DrawLine(int2 position0, int2 position1, DWORD color, DrawLineType type);
 
 	static void DrawCall(RenderContext* context, vector<float3> vertices, vector<int> indices, vector<float3> normals, vector<float4> colors);
 
 	/// \brief 光栅化
-	static void Rasterize_Standard(tuple<float4> v0, tuple<float4> v1, tuple<float4> v2);
-	static vector<tuple<float4>> SplitTriangle_Standard(tuple<float4> v0, tuple<float4> v1, tuple<float4> v2);
-	static void RasterizeFace_Standard(tuple<float4> v0, tuple<float4> v1, tuple<float4> v2);
-	static void Rasterize_Barycentric(tuple<float4, float4> v0, tuple<float4, float4> v1, tuple<float4, float4> v2);
-	static void Rasterize_WireFrame(tuple<float4> v0, tuple<float4> v1, tuple<float4> v2);
+	static void Rasterize_Standard(tuple<int2> v0, tuple<int2> v1, tuple<int2> v2);
+	static vector<tuple<int2>> SplitTriangle_Standard(tuple<int2> v0, tuple<int2> v1, tuple<int2> v2);
+	static void RasterizeFace_Standard(tuple<int2> v0, tuple<int2> v1, tuple<int2> v2);
+	static void Rasterize_Barycentric(tuple<int2, float4> v0, tuple<int2, float4> v1, tuple<int2, float4> v2);
+	static void Rasterize_WireFrame(int2 v0, int2 v1, int2 v2);
 
 	static void SetViewPortData(int width, int height);
 

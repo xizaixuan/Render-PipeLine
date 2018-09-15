@@ -65,6 +65,9 @@
     <ClInclude Include="Utility\RenderContext.h">
       <Filter>Header Files\Utility</Filter>
     </ClInclude>
+    <ClInclude Include="Mathematics\Int2.h">
+      <Filter>Header Files\Mathematics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Framework\RenderDevice.cpp">
@@ -99,6 +102,9 @@
     </ClCompile>
     <ClCompile Include="Utility\RenderContext.cpp">
       <Filter>Source Files\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="Mathematics\Int2.cpp">
+      <Filter>Source Files\Mathematics</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
