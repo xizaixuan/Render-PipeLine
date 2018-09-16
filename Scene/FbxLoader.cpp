@@ -3,6 +3,7 @@
 #include <fbxsdk/core/math/fbxvector4.h>
 #include <fbxsdk/core/math/fbxaffinematrix.h>
 #include <fbxsdk/scene/geometry/fbxnode.h>
+#include "../RenderPipeLine/Mathematics/MathUtil.h"
 
 #ifdef IOS_REF
 #undef  IOS_REF
@@ -293,12 +294,21 @@ void FbxLoader::ProcessNormals(FbxMesh* pMesh, vector<float3>& normals, FbxAMatr
 		{
 			int lIndexByPolygonVertex = 0;
 
+			vector<vector<float3>> normalArray;
+			for (int i=0;i<pMesh->GetControlPointsCount();i++)
+			{
+				vector<float3> array;
+				normalArray.push_back(array);
+			}
+
 			for (int lPolygonIndex = 0; lPolygonIndex < pMesh->GetPolygonCount(); lPolygonIndex++)
 			{
 				int lPolygonSize = pMesh->GetPolygonSize(lPolygonIndex);
 
 				for (int i = 0; i < lPolygonSize; i++)
 				{
+					int lControlPointIndex = pMesh->GetPolygonVertex(lPolygonIndex, i);
+
 					int lNormalIndex = 0;
 
 					if (lNormalElement->GetReferenceMode() == FbxGeometryElement::eDirect)
@@ -309,10 +319,21 @@ void FbxLoader::ProcessNormals(FbxMesh* pMesh, vector<float3>& normals, FbxAMatr
 
 					FbxVector4 lNormal = lNormalElement->GetDirectArray().GetAt(lNormalIndex);
 					auto newNormal = mat.MultT(lNormal);
-					normals.push_back(float3(newNormal.mData[0], newNormal.mData[1], newNormal.mData[2]));
+					normalArray[lControlPointIndex].push_back(float3(newNormal.mData[0], newNormal.mData[1], newNormal.mData[2]));
 
 					lIndexByPolygonVertex++;
 				}
+			}
+
+			for (int i = 0; i < pMesh->GetControlPointsCount(); i++)
+			{
+				float3 normal(0.0f, 0.0f, 0.0);
+				for (auto n : normalArray[i])
+				{
+					normal = normal + n;
+				}
+
+				normals.push_back(MathUtil::Normalize(normal));
 			}
 		}
 	}
