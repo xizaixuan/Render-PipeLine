@@ -7,6 +7,7 @@
 #include <tuple>
 #include <functional>
 #include "RenderContext.h"
+#include "RenderBuffer.h"
 using namespace std;
 
 Matrix RenderPipeLine::m_ViewPortMatrix;
@@ -91,46 +92,37 @@ void RenderPipeLine::DrawLine(int2 position0, int2 position1, DWORD color, DrawL
 	
 }
 
-void RenderPipeLine::DrawCall(RenderContext* context, vector<float3> vertices, vector<int> indices, vector<float3> normals, vector<float4> colors)
+void RenderPipeLine::DrawCall(const RenderContext* context, const RenderBuffer& renderBuffer)
 {
-	auto VertexShader = [](const vector<float3>& vertices, const Matrix& vp, vector<float4>& vertexOutPut)
+	auto vertices	= renderBuffer.vertices;
+	auto indices	= renderBuffer.indices;
+	auto normals = renderBuffer.normals;
+	auto colors = renderBuffer.colors;
+
+	auto VertexShader = [](const vector<float3>& vertices, vector<float3>& normals, const Matrix& vp, vector<float4>& vertexOutPut)
 	{
 		for (auto vertex : vertices)
 		{
 			vertexOutPut.push_back(float4(vertex.x, vertex.y, vertex.z, 1.0f)*vp);
 		}
-	};
 
-	auto TriangleSetup = [](vector<float3> vertices, vector<int> indices, vector<float3> normals)
-	{
-		auto indexLength = indices.size();
-		for (int index = 0; index < indexLength; index += 3)
+		for (auto& normal : normals)
 		{
-			auto index0 = indices[index + 0];
-			auto index1 = indices[index + 1];
-			auto index2 = indices[index + 2];
-
-			auto normal0 = normals[index + 0];
-			auto normal1 = normals[index + 1];
-			auto normal2 = normals[index + 2];
-
-			auto position0 = vertices[index0];
-			auto position1 = vertices[index1];
-			auto position2 = vertices[index2];
-
-			auto faceNormal = MathUtil::Normalize((normal0 + normal1 + normal2) * 0.3333f);
+			auto n = float4(normal.x, normal.y, normal.z, 0.0f)*vp;
+			normal = MathUtil::Normalize(float3(n.x, n.y, n.z));
 		}
 	};
 
 	auto vp = context->ViewMatrix * context->ProjMatrix;
 	vector<float4> vertexOutPut;
-	VertexShader(vertices, vp, vertexOutPut);
+	VertexShader(vertices, normals, vp, vertexOutPut);
 
 	for (auto& vertex : vertexOutPut)
 	{
 		vertex = MathUtil::Homogenous(vertex);
 	}
 
+	// TriangleSetup
 	auto indexLength = indices.size();
 	for (int index = 0; index < indexLength; index +=3 )
 	{
@@ -146,6 +138,10 @@ void RenderPipeLine::DrawCall(RenderContext* context, vector<float3> vertices, v
 		auto color1 = colors[index1];
 		auto color2 = colors[index2];
 
+		auto normal0 = normals[index0];
+		auto normal1 = normals[index1];
+		auto normal2 = normals[index2];
+
 		auto faceNormal = MathUtil::Cross(float3(v1.x - v0.x, v1.y - v0.y, v1.z - v0.z), float3(v2.x - v0.x, v2.y - v0.y, v2.z - v0.z));
 		auto viewDir = MathUtil::Normalize(float3(0.0f, 0.0f, 0.0f) - float3(v0.x, v0.y, v0.z));
 		auto visible = faceNormal * viewDir >= 0.0f;
@@ -156,8 +152,11 @@ void RenderPipeLine::DrawCall(RenderContext* context, vector<float3> vertices, v
 			v1 = v1 * m_ViewPortMatrix;
 			v2 = v2 * m_ViewPortMatrix;
 
-			//Rasterize_Barycentric(tuple<int2, float4>(int2(v0.x, v0.y), color0), tuple<int2, float4>(int2(v1.x, v1.y), color1), tuple<int2, float4>(int2(v2.x, v2.y), color2));
-			Rasterize_Standard(tuple<int2, float4>(int2(v0.x, v0.y), color0), tuple<int2, float4>(int2(v1.x, v1.y), color1), tuple<int2, float4>(int2(v2.x, v2.y), color2));
+			Rasterize_Barycentric(context,
+				tuple<int2, float4, float3>(int2(v0.x, v0.y), color0, normal0),
+				tuple<int2, float4, float3>(int2(v1.x, v1.y), color1, normal1),
+				tuple<int2, float4, float3>(int2(v2.x, v2.y), color2, normal2));
+			//Rasterize_Standard(tuple<int2, float4>(int2(v0.x, v0.y), color0), tuple<int2, float4>(int2(v1.x, v1.y), color1), tuple<int2, float4>(int2(v2.x, v2.y), color2));
 			//Rasterize_WireFrame(int2(v0.x, v0.y), int2(v1.x, v1.y), int2(v2.x, v2.y));
 		}
 	}
@@ -335,7 +334,7 @@ void RenderPipeLine::RasterizeFace_Standard(tuple<int2, float4> v0, tuple<int2, 
 	}
 }
 
-void RenderPipeLine::Rasterize_Barycentric(tuple<int2, float4> v0, tuple<int2, float4> v1, tuple<int2, float4> v2)
+void RenderPipeLine::Rasterize_Barycentric(const RenderContext* context, tuple<int2, float4, float3> v0, tuple<int2, float4, float3> v1, tuple<int2, float4, float3> v2)
 {
 	auto edgeFunction = [](const int2& a, const int2& b, const int2& c)
 	{
@@ -360,6 +359,10 @@ void RenderPipeLine::Rasterize_Barycentric(tuple<int2, float4> v0, tuple<int2, f
 	float4 color1 = get<1>(v1);
 	float4 color2 = get<1>(v2);
 
+	float3 normal0 = get<2>(v0);
+	float3 normal1 = get<2>(v1);
+	float3 normal2 = get<2>(v2);
+
 	int area = edgeFunction(position0, position1, position2);
 
 	int xMin = floor(boundMin(position0.x, position1.x, position2.x));
@@ -383,13 +386,18 @@ void RenderPipeLine::Rasterize_Barycentric(tuple<int2, float4> v0, tuple<int2, f
 				w1 /= area;
 				w2 /= area;
 
-				float r = w0 * color0.x + w1 * color1.x + w2 * color2.x;
-				float g = w0 * color0.y + w1 * color1.y + w2 * color2.y;
-				float b = w0 * color0.z + w1 * color1.z + w2 * color2.z;
+				//////////////////////////////////////////////////////////////////////////
+				// color
+				float4 newColor = color0 * w0 + color1 * w1 + color2 * w2;
+
+				float r = min(newColor.x, 1);
+				float g = min(newColor.y, 1);
+				float b = min(newColor.z, 1);
 
 				DWORD color = (255 << 24) + ((int)(r * 255) << 16) + ((int)(g * 255) << 8) + (int)(b * 255);
+				//DWORD color = (255 << 24) + ((int)(255) << 16) + ((int)(255) << 8) + (int)(255);
 
-				// »æÖÆÏñËØµã
+				// PixelShader
 				RenderDevice::getSingletonPtr()->DrawPixel(std::lround(x), std::lround(y), color);
 			}
 		}

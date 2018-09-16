@@ -78,12 +78,7 @@ void Engine::RenderScene()
 
 	for (auto buffer : m_RenderBuffers)
 	{
-		RenderPipeLine::DrawCall(
-			m_pRenderContext,
-			buffer.vertices,
-			buffer.indices,
-			buffer.normals,
-			buffer.colors);
+		RenderPipeLine::DrawCall(m_pRenderContext, buffer);
 	}
 }
 
