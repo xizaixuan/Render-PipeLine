@@ -38,9 +38,9 @@ public:
 	static void DrawCall(RenderContext* context, vector<float3> vertices, vector<int> indices, vector<float3> normals, vector<float4> colors);
 
 	/// \brief π‚’§ªØ
-	static void Rasterize_Standard(tuple<int2> v0, tuple<int2> v1, tuple<int2> v2);
-	static vector<tuple<int2>> SplitTriangle_Standard(tuple<int2> v0, tuple<int2> v1, tuple<int2> v2);
-	static void RasterizeFace_Standard(tuple<int2> v0, tuple<int2> v1, tuple<int2> v2);
+	static void Rasterize_Standard(tuple<int2, float4> v0, tuple<int2, float4> v1, tuple<int2, float4> v2);
+	static vector<tuple<int2, float4>> SplitTriangle_Standard(tuple<int2, float4> v0, tuple<int2, float4> v1, tuple<int2, float4> v2);
+	static void RasterizeFace_Standard(tuple<int2, float4> v0, tuple<int2, float4> v1, tuple<int2, float4> v2);
 	static void Rasterize_Barycentric(tuple<int2, float4> v0, tuple<int2, float4> v1, tuple<int2, float4> v2);
 	static void Rasterize_WireFrame(int2 v0, int2 v1, int2 v2);
 

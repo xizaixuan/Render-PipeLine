@@ -157,13 +157,13 @@ void RenderPipeLine::DrawCall(RenderContext* context, vector<float3> vertices, v
 			v2 = v2 * m_ViewPortMatrix;
 
 			//Rasterize_Barycentric(tuple<int2, float4>(int2(v0.x, v0.y), color0), tuple<int2, float4>(int2(v1.x, v1.y), color1), tuple<int2, float4>(int2(v2.x, v2.y), color2));
-			//Rasterize_Standard(tuple<Int2>(int2(v0.x, v0.y)), tuple<Int2>(int2(v1.x, v1.y)), tuple<Int2>(int2(v2.x, v2.y)));
-			Rasterize_WireFrame(int2(v0.x, v0.y), int2(v1.x, v1.y), int2(v2.x, v2.y));
+			Rasterize_Standard(tuple<int2, float4>(int2(v0.x, v0.y), color0), tuple<int2, float4>(int2(v1.x, v1.y), color1), tuple<int2, float4>(int2(v2.x, v2.y), color2));
+			//Rasterize_WireFrame(int2(v0.x, v0.y), int2(v1.x, v1.y), int2(v2.x, v2.y));
 		}
 	}
 }
 
-void RenderPipeLine::Rasterize_Standard(tuple<int2> v0, tuple<int2> v1, tuple<int2> v2)
+void RenderPipeLine::Rasterize_Standard(tuple<int2, float4> v0, tuple<int2, float4> v1, tuple<int2, float4> v2)
 {
 	auto position0 = ref(get<0>(v0));
 	auto position1 = ref(get<0>(v1));
@@ -196,7 +196,7 @@ void RenderPipeLine::Rasterize_Standard(tuple<int2> v0, tuple<int2> v1, tuple<in
 		}
 
 		// 光栅化三角形
-		RasterizeFace_Standard(position0, position1, position2);
+		RasterizeFace_Standard(v0, v1, v2);
 	}
 
 	// y1 == y2 则是平顶三角形
@@ -208,7 +208,7 @@ void RenderPipeLine::Rasterize_Standard(tuple<int2> v0, tuple<int2> v1, tuple<in
 		}
 
 		// 光栅化三角形
-		RasterizeFace_Standard(position0, position1, position2);
+		RasterizeFace_Standard(v0, v1, v2);
 	}
 
 	// 任意三角形
@@ -225,41 +225,47 @@ void RenderPipeLine::Rasterize_Standard(tuple<int2> v0, tuple<int2> v1, tuple<in
 	}
 }
 
-vector<tuple<int2>> RenderPipeLine::SplitTriangle_Standard(tuple<int2> v0, tuple<int2> v1, tuple<int2> v2)
+vector<tuple<int2, float4>> RenderPipeLine::SplitTriangle_Standard(tuple<int2, float4> v0, tuple<int2, float4> v1, tuple<int2, float4> v2)
 {
-	vector<tuple<int2>> vertices;
-
-	auto v3 = v0;
-	auto v4 = v1;
-	auto v5 = v2;
+	vector<tuple<int2, float4>> vertices;
 
 	auto position0 = get<0>(v0);
 	auto position1 = get<0>(v1);
 	auto position2 = get<0>(v2);
 
+	auto color0 = get<1>(v0);
+	auto color1 = get<1>(v1);
+	auto color2 = get<1>(v2);
+
 	float dy1_0 = position1.y - position0.y;
 	float dy2_0 = position2.y - position0.y;
 	float dx2_0 = position2.x - position0.x;
+	
+	float4 dc2_0 = color2 - color0;
 
 	// dx(new-0)/dx(2-0) = dy(1-0)/dy(2-0) => newX = 0 + dy(1-0)/dy(2-0)*dx(2-0)
-	float newX = position0.x + (dy1_0 / dy2_0)*dx2_0;
+	float newX = position0.x + dx2_0 * (dy1_0 / dy2_0);
+
+	float4 newColor = color0 + dc2_0 * (dy1_0 / dy2_0);
+
+	tuple<int2, float4> newVertex(int2(newX, position1.y), newColor);
 
 	//////////////////////////////////////////////////////////////////////////
 	// v0, v1, v2
-	vertices.push_back({ position0 });
-	vertices.push_back({ position1 });
-	vertices.push_back({ int2(newX, position1.y) });
+	vertices.push_back(v0);
+	vertices.push_back(v1);
+	vertices.push_back(newVertex);
 
 	//////////////////////////////////////////////////////////////////////////
 	// v3, v4, v5
-	vertices.push_back({ position1 });
-	vertices.push_back({ position2 });
-	vertices.push_back({ int2(newX, position1.y) });
+	vertices.push_back(v1);
+	vertices.push_back(v2);
+	vertices.push_back(newVertex);
 
 	return vertices;
 }
 
-void RenderPipeLine::RasterizeFace_Standard(tuple<int2> v0, tuple<int2> v1, tuple<int2> v2)
+void RenderPipeLine::RasterizeFace_Standard(tuple<int2, float4> v0, tuple<int2, float4> v1, tuple<int2, float4> v2)
 {
 	int x0 = get<0>(v0).x;
 	int y0 = get<0>(v0).y;
@@ -270,6 +276,10 @@ void RenderPipeLine::RasterizeFace_Standard(tuple<int2> v0, tuple<int2> v1, tupl
 	int x2 = get<0>(v2).x;
 	int y2 = get<0>(v2).y;
 
+	float4 color0 = get<1>(v0);
+	float4 color1 = get<1>(v1);
+	float4 color2 = get<1>(v2);
+
 	// 检测三角形是否为直线
 	if (MathUtil::IsEqual(x0, x1) && MathUtil::IsEqual(x1, x2) || MathUtil::IsEqual(y0, y1) && MathUtil::IsEqual(y1, y2))
 		return;
@@ -277,39 +287,51 @@ void RenderPipeLine::RasterizeFace_Standard(tuple<int2> v0, tuple<int2> v1, tupl
 	bool topface = y0 > y2;
 
 	// 设置扫描线起点x及终点x
-	float xstart= (topface ? x1 : x0);
-	//float xend	= (topface ? x2 : x0) + 0.5f;
-	float xend = (topface ? get<0>(v2).x : get<0>(v0).x) + 0.5f;
+	float xstart	= (topface ? x1 : x0);
+	float xend		= (topface ? x2 : x0);
+	float4 cstart	= (topface ? color1 : color0);
+	float4 cend		= (topface ? color2 : color0);
 
 	// 设置扫描线起始y及终点y
 	int ystart= (topface ? y2 : y0);
-	//int yend  = (topface ? y0 : y2) + 0.5f;
-	int yend = (topface ? get<0>(v0).y : get<0>(v2).y) + 0.5f;
+	int yend  = (topface ? y0 : y2);
 
 	// 计算三角形的高
 	float dy = yend - ystart;
+	float inv_dy = 1.0f / dy;
 
-	// 计算左斜边x积分
-	int diffXL = topface ? (x0 - x1) : (x1 - x0);
-	float dxdyl = diffXL / dy;
+	// 计算左斜边积分
+	float dxdyl = (topface ? (x0 - x1) : (x1 - x0)) * inv_dy;
+	float4 dcdyl = (topface ? (color0 - color1) : (color1 - color0)) * inv_dy;
 
-	// 计算右斜边x积分
-	int diffXR = topface ? (x0 - x2) : (x2 - x0);
-	float dxdyr = diffXR / dy;
+	// 计算右斜边积分
+	float dxdyr = (topface ? (x0 - x2) : (x2 - x0)) * inv_dy;
+	float4 dcdyr = (topface ? (color0 - color2) : (color2 - color0)) * inv_dy;
 
-	DWORD color = (255 << 24) + (255 << 16) + (255 << 8) + 255;
+	//DWORD color = (255 << 24) + (255 << 16) + (255 << 8) + 255;
 
 	for (int yi = ystart; yi <= yend; yi++)
 	{
+		float4 color = cstart;
+		float4 dcdx = (cend - cstart) * (1.0f / (xend - xstart));
 		for (int xi = xstart; xi <= xend; xi++)
 		{
+			float r = min(color.x, 1);
+			float g = min(color.y, 1);
+			float b = min(color.z, 1);
+
+			DWORD curColor = (255 << 24) + ((int)(r * 255) << 16) + ((int)(g * 255) << 8) + (int)(b * 255);
+
 			// 绘制像素点
-			RenderDevice::getSingletonPtr()->DrawPixel(xi, yi, color);
+			RenderDevice::getSingletonPtr()->DrawPixel(xi, yi, curColor);
+			color += dcdx;
 		}
 
 		//计算下一条扫描线起点及终点
 		xstart += dxdyl;
 		xend += dxdyr;
+		cstart += dcdyl;
+		cend += dcdyr;
 	}
 }
 

@@ -38,6 +38,34 @@ Float4& Float4::operator = (const Float4& a)
 	return *this;
 }
 
+Float4 Float4::operator+(const Float4 & a) const
+{
+	return Float4(x + a.x, y + a.y, z + a.z, w + a.w);
+}
+
+Float4 Float4::operator+=(const Float4 & a)
+{
+	this->x += a.x;
+	this->y += a.y;
+	this->z += a.z;
+	this->w += a.w;
+	return *this;
+}
+
+Float4 Float4::operator-(const Float4 & a) const
+{
+	return Float4(x - a.x, y - a.y, z - a.z, w - a.w);
+}
+
+Float4 Float4::operator-=(const Float4 & a)
+{
+	this->x -= a.x;
+	this->y -= a.y;
+	this->z -= a.z;
+	this->w -= a.w;
+	return *this;
+}
+
 Float4 Float4::operator *(float a) const
 {
 	return Float4( x*a, y*a, z*a, w*a);

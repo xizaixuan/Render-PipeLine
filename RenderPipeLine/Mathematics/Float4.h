@@ -28,6 +28,14 @@ public:
 	/// \brief 重载赋值运算符,并返回引用，以实现左值
 	Float4& operator = (const Float4& a);
 
+	/// \brief 重载二元"+"运算符
+	Float4 operator +(const Float4& a) const;
+	Float4 operator +=(const Float4& a);
+
+	/// \brief 重载二元"-"运算符
+	Float4 operator -(const Float4& a) const;
+	Float4 operator -=(const Float4& a);
+
 	/// \brief 重载二元"*"运算符 与标量
 	Float4 operator *(float a) const;
 	Float4 operator *(const Matrix& a) const;

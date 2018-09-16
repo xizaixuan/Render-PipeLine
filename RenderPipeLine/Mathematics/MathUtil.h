@@ -13,6 +13,7 @@
 #include "float4.h"
 #include "Matrix.h"
 #include <limits>
+#include "Int2.h"
 
 namespace MathUtil
 {
@@ -26,6 +27,7 @@ namespace MathUtil
 	float Length(const float2& v);
 	float Length(const float3& v);
 	float Length(const float4& v);
+	float Length(const int2& v);
 
 	/// brief µ¥Î»»¯
 	float2 Normalize(float2& v);
@@ -48,6 +50,12 @@ namespace MathUtil
 	static T Clamp(const T& x, const T& low, const T& high)
 	{
 		return x < low ? low : (x > high ? high : x);
+	}
+
+	template<typename T>
+	static T Lerp(const T& a, const T& b, const float factor)
+	{
+		return a + (b-a)*factor;
 	}
 
 	float3 Forward(Matrix mat);

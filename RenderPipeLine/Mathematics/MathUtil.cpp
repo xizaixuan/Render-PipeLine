@@ -1,4 +1,5 @@
 #include "MathUtil.h"
+#include "Int2.h"
 
 float MathUtil::AngelToRadian(float ang)
 {
@@ -23,6 +24,11 @@ float MathUtil::Length(const float3& v)
 float MathUtil::Length(const float4& v)
 {
 	return sqrtf(v.x*v.x + v.y*v.y + v.z*v.z);
+}
+
+float MathUtil::Length(const int2& v)
+{
+	return sqrtf(v.x*v.x + v.y*v.y);
 }
 
 float2 MathUtil::Normalize(float2& v)
