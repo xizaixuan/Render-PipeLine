@@ -235,10 +235,13 @@ void FbxLoader::ProcessMesh(FbxNode* pNode, vector<float3>& vertices, vector<int
 	auto globalTransform = pNode->EvaluateGlobalTransform(0.0f);
 	auto tranformMat = geometricTransform * globalTransform;
 
-	ProcessVertex(lMesh, vertices, tranformMat);	// vertices			
-	ProcessIndex(lMesh, indices);					// indices
+	ProcessVertex(lMesh, vertices, tranformMat);		
+	ProcessIndex(lMesh, indices);
 	ProcessNormals(lMesh, normals, tranformMat);
 	ProcessVertexColor(lMesh, colors);
+
+	vector<float2> uvs;
+	ProcessUV(lMesh, uvs);
 }
 
 void FbxLoader::ProcessVertex(FbxMesh* pMesh, vector<float3>& vertices, FbxAMatrix mat)
@@ -358,6 +361,65 @@ void FbxLoader::ProcessVertexColor(FbxMesh* pMesh, vector<float4>& colors)
 			auto color = leVtxc->GetDirectArray().GetAt(lColorlIndex);
 
 			colors.push_back(float4(color.mRed, color.mGreen, color.mBlue, color.mAlpha));
+		}
+	}
+}
+
+void FbxLoader::ProcessUV(FbxMesh * pMesh, vector<float2>& uvs)
+{
+	int lPolygonCount = pMesh->GetPolygonCount();
+
+	int vertexId = 0;
+	for (int i = 0; i < lPolygonCount; i++)
+	{
+		int lPolygonSize = pMesh->GetPolygonSize(i);
+
+		for (int j = 0; j < lPolygonSize; j++)
+		{
+			int lControlPointIndex = pMesh->GetPolygonVertex(i, j);
+
+			for (int l = 0; l < pMesh->GetElementUVCount(); ++l)
+			{
+				FbxGeometryElementUV* leUV = pMesh->GetElementUV(l);
+
+				switch (leUV->GetMappingMode())
+				{
+				default:
+					break;
+				case FbxGeometryElement::eByControlPoint:
+					switch (leUV->GetReferenceMode())
+					{
+					case FbxGeometryElement::eDirect:
+						//Display2DVector(header, leUV->GetDirectArray().GetAt(lControlPointIndex));
+						break;
+					case FbxGeometryElement::eIndexToDirect:
+					{
+						int id = leUV->GetIndexArray().GetAt(lControlPointIndex);
+						//Display2DVector(header, leUV->GetDirectArray().GetAt(id));
+					}
+					break;
+					default:
+						break; // other reference modes not shown here!
+					}
+					break;
+
+				case FbxGeometryElement::eByPolygonVertex:
+				{
+					int lTextureUVIndex = pMesh->GetTextureUVIndex(i, j);
+					switch (leUV->GetReferenceMode())
+					{
+					case FbxGeometryElement::eDirect:
+					case FbxGeometryElement::eIndexToDirect:
+					{
+						//Display2DVector(header, leUV->GetDirectArray().GetAt(lTextureUVIndex));
+					}
+					break;
+					}
+				}
+				break;
+				}
+			}
+			vertexId++;
 		}
 	}
 }

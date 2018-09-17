@@ -15,6 +15,7 @@
 #include "../RenderPipeLine/Utility/RenderBuffer.h"
 #include <fbxsdk/core/math/fbxaffinematrix.h>
 #include "../RenderPipeLine/Mathematics/Float4.h"
+#include "../RenderPipeLine/Mathematics/Float2.h"
 
 using namespace std;
 
@@ -39,6 +40,7 @@ private:
 	void ProcessIndex(FbxMesh* pMesh, vector<int>& indices);
 	void ProcessNormals(FbxMesh* pMesh, vector<float3>& normals, FbxAMatrix mat);
 	void ProcessVertexColor(FbxMesh* pMesh, vector<float4>& colors);
+	void ProcessUV(FbxMesh* pMesh, vector<float2>& uvs);
 
 public:
 	FbxManager* m_pFbxManager;
