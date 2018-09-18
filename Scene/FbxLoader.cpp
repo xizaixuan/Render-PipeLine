@@ -241,7 +241,7 @@ void FbxLoader::ProcessMesh(FbxNode* pNode, vector<float3>& vertices, vector<int
 	ProcessVertexColor(lMesh, colors);
 
 	vector<float2> uvs;
-	ProcessUV(lMesh, uvs);
+	//ProcessUV(lMesh, uvs);
 }
 
 void FbxLoader::ProcessVertex(FbxMesh* pMesh, vector<float3>& vertices, FbxAMatrix mat)

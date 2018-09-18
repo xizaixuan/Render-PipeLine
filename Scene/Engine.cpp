@@ -17,7 +17,7 @@ Engine::Engine()
 	, m_pRenderContext(nullptr)
 	, m_Theta(-MathUtil::pi * 0.5f)
 	, m_Phi(MathUtil::pi * 0.5f)
-	, m_Radius(800.0f)
+	, m_Radius(8000.0f)
 	, m_LastMousePos(0.0f, 0.0f)
 {
 }
