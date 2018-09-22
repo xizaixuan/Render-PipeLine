@@ -130,6 +130,7 @@
     <ClInclude Include="Mathematics\Int2.h" />
     <ClInclude Include="Mathematics\MathUtil.h" />
     <ClInclude Include="Mathematics\Matrix.h" />
+    <ClInclude Include="Utility\Material.h" />
     <ClInclude Include="Utility\PipeLineUtility.h" />
     <ClInclude Include="Utility\RenderBuffer.h" />
     <ClInclude Include="Utility\RenderContext.h" />

@@ -199,20 +199,16 @@ void FbxLoader::ProcessContent(FbxNode* pNode, vector<RenderBuffer>& renderBuffe
 
 		switch (lAttributeType)
 		{
-		default:
-			break;
-
-// 		case FbxNodeAttribute::eSkeleton:
-// 			ProcessSkeleton(pNode);
-// 			break;
-
 		case FbxNodeAttribute::eMesh:
 			vector<float3> vertices;
 			vector<int> indices;
 			vector<float3> normals;
 			vector<float4> colors;
-			ProcessMesh(pNode, vertices, indices, normals, colors);
-			renderBuffer.push_back({ vertices, normals, indices, colors });
+			vector<float2> uvs;
+			vector<int> matertialRefs;
+			vector<Material> materials;
+			ProcessMesh(pNode, vertices, indices, normals, colors, uvs, matertialRefs, materials);
+			renderBuffer.push_back({ vertices, normals, indices, colors, uvs, matertialRefs, materials });
 			break;
 		}
 	}
@@ -223,7 +219,7 @@ void FbxLoader::ProcessContent(FbxNode* pNode, vector<RenderBuffer>& renderBuffe
 	}
 }
 
-void FbxLoader::ProcessMesh(FbxNode* pNode, vector<float3>& vertices, vector<int>& indices, vector<float3>& normals, vector<float4>& colors)
+void FbxLoader::ProcessMesh(FbxNode* pNode, vector<float3>& vertices, vector<int>& indices, vector<float3>& normals, vector<float4>& colors, vector<float2>& uvs, vector<int>& matertialRefs, vector<Material>& materials)
 {
 	FbxMesh* lMesh = (FbxMesh*)pNode->GetNodeAttribute();
 
@@ -239,9 +235,9 @@ void FbxLoader::ProcessMesh(FbxNode* pNode, vector<float3>& vertices, vector<int
 	ProcessIndex(lMesh, indices);
 	ProcessNormals(lMesh, normals, tranformMat);
 	ProcessVertexColor(lMesh, colors);
-
-	vector<float2> uvs;
-	//ProcessUV(lMesh, uvs);
+	ProcessUV(lMesh, uvs);
+	ProcessMaterialConnection(lMesh, matertialRefs);
+	ProcessMaterial(lMesh, materials);
 }
 
 void FbxLoader::ProcessVertex(FbxMesh* pMesh, vector<float3>& vertices, FbxAMatrix mat)
@@ -390,12 +386,17 @@ void FbxLoader::ProcessUV(FbxMesh * pMesh, vector<float2>& uvs)
 					switch (leUV->GetReferenceMode())
 					{
 					case FbxGeometryElement::eDirect:
-						//Display2DVector(header, leUV->GetDirectArray().GetAt(lControlPointIndex));
+					{
+						auto uv = leUV->GetDirectArray().GetAt(lControlPointIndex);
+						uvs.push_back(float2(uv.mData[0], uv.mData[1]));
+					}
 						break;
 					case FbxGeometryElement::eIndexToDirect:
 					{
+						
 						int id = leUV->GetIndexArray().GetAt(lControlPointIndex);
-						//Display2DVector(header, leUV->GetDirectArray().GetAt(id));
+						auto uv = leUV->GetDirectArray().GetAt(id);
+						uvs.push_back(float2(uv.mData[0], uv.mData[1]));
 					}
 					break;
 					default:
@@ -411,7 +412,8 @@ void FbxLoader::ProcessUV(FbxMesh * pMesh, vector<float2>& uvs)
 					case FbxGeometryElement::eDirect:
 					case FbxGeometryElement::eIndexToDirect:
 					{
-						//Display2DVector(header, leUV->GetDirectArray().GetAt(lTextureUVIndex));
+						auto uv = leUV->GetDirectArray().GetAt(lTextureUVIndex);
+						uvs.push_back(float2(uv.mData[0], uv.mData[1]));
 					}
 					break;
 					}
@@ -420,6 +422,35 @@ void FbxLoader::ProcessUV(FbxMesh * pMesh, vector<float2>& uvs)
 				}
 			}
 			vertexId++;
+		}
+	}
+}
+
+void FbxLoader::ProcessMaterialConnection(FbxMesh * pMesh, vector<int>& matertialRefs)
+{
+	int lPolygonCount = pMesh->GetPolygonCount();
+
+	auto pMaterialIndices = &pMesh->GetElementMaterial()->GetIndexArray();
+
+	for (int triangleIndex = 0; triangleIndex < lPolygonCount; triangleIndex++)
+	{
+		matertialRefs.push_back(pMaterialIndices->GetAt(triangleIndex));
+	}
+}
+
+void FbxLoader::ProcessMaterial(FbxMesh * pMesh, vector<Material>& materials)
+{
+	int materialCount;
+
+	if (pMesh && pMesh->GetNode())
+	{
+		FbxNode* pNode = pMesh->GetNode();
+		int materialCount = pNode->GetMaterialCount();
+
+		for (int materialIndex = 0; materialIndex < materialCount; materialIndex++)
+		{
+			FbxSurfaceMaterial* pSurfaceMaterial = pNode->GetMaterial(materialIndex);
+			materials.push_back(Material{ pSurfaceMaterial->GetName() });
 		}
 	}
 }

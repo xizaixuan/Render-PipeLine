@@ -35,12 +35,14 @@ public:
 private:
 	void ProcessContent(FbxScene* pScene, vector<RenderBuffer>& renderBuffer);
 	void ProcessContent(FbxNode* pNode, vector<RenderBuffer>& renderBuffer);
-	void ProcessMesh(FbxNode* pNode, vector<float3>& vertices, vector<int>& indices, vector<float3>& normals, vector<float4>& colors);
+	void ProcessMesh(FbxNode* pNode, vector<float3>& vertices, vector<int>& indices, vector<float3>& normals, vector<float4>& colors, vector<float2>& uvs, vector<int>& matertialRefs, vector<Material>& materials);
 	void ProcessVertex(FbxMesh* pMesh, vector<float3>& vertices, FbxAMatrix mat);
 	void ProcessIndex(FbxMesh* pMesh, vector<int>& indices);
 	void ProcessNormals(FbxMesh* pMesh, vector<float3>& normals, FbxAMatrix mat);
 	void ProcessVertexColor(FbxMesh* pMesh, vector<float4>& colors);
 	void ProcessUV(FbxMesh* pMesh, vector<float2>& uvs);
+	void ProcessMaterialConnection(FbxMesh* pMesh, vector<int>& matertialRefs);
+	void ProcessMaterial(FbxMesh* pMesh, vector<Material>& materials);
 
 public:
 	FbxManager* m_pFbxManager;

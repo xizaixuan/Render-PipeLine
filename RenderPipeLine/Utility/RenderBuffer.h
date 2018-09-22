@@ -8,6 +8,8 @@
 #include <vector>
 #include "../Mathematics/Float3.h"
 #include "../Mathematics/Float4.h"
+#include "../Mathematics/Float2.h"
+#include "Material.h"
 using namespace std;
 
 #ifndef RenderBuffer_H_
@@ -16,10 +18,13 @@ using namespace std;
 
 struct RenderBuffer
 {
-	vector<float3>	vertices;
-	vector<float3>	normals;
-	vector<int>		indices;
-	vector<float4>	colors;
+	vector<float3>		vertices;
+	vector<float3>		normals;
+	vector<int>			indices;
+	vector<float4>		colors;
+	vector<float2>		uvs;
+	vector<int>			materialRefs;
+	vector<Material>	materials;
 };
 
 #endif

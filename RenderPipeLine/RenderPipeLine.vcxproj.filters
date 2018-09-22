@@ -68,6 +68,9 @@
     <ClInclude Include="Mathematics\Int2.h">
       <Filter>Header Files\Mathematics</Filter>
     </ClInclude>
+    <ClInclude Include="Utility\Material.h">
+      <Filter>Header Files\Utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Framework\RenderDevice.cpp">
