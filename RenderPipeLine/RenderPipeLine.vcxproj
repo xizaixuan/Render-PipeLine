@@ -79,6 +79,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>FBXSDK_SHARED （fbxsdk version 2012.2);%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>d2d1.lib;dxguid.lib;%(AdditionalDependencies)</AdditionalDependencies>

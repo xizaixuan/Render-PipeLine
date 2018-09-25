@@ -43,6 +43,7 @@ private:
 	void ProcessUV(FbxMesh* pMesh, vector<float2>& uvs);
 	void ProcessMaterialConnection(FbxMesh* pMesh, vector<int>& matertialRefs);
 	void ProcessMaterial(FbxMesh* pMesh, vector<Material>& materials);
+	void ProcessTexture(FbxGeometry* pGeometry);
 
 public:
 	FbxManager* m_pFbxManager;
