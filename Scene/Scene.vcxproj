@@ -22,10 +22,12 @@
     <ClCompile Include="Engine.cpp" />
     <ClCompile Include="FbxLoader.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="PNGLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine.h" />
     <ClInclude Include="FbxLoader.h" />
+    <ClInclude Include="PNGLoader.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
@@ -80,8 +82,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LibraryPath>..\Library;$(LibraryPath)</LibraryPath>
-    <IncludePath>..\RenderLibrary\Framework;..\RenderLibrary\Utility;..\FBX SDK;$(IncludePath)</IncludePath>
+    <LibraryPath>..\Library;..\Lodepng;$(LibraryPath)</LibraryPath>
+    <IncludePath>..\RenderLibrary\Framework;..\RenderLibrary\Utility;..\FBX SDK;..\Lodepng;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -91,7 +93,7 @@
       <PreprocessorDefinitions>FBXSDK_SHARED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>d2d1.lib;dxguid.lib;renderengine.lib;libfbxsdk.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d2d1.lib;dxguid.lib;renderengine.lib;libfbxsdk.lib;lodepng.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>copy ..\Library\libfbxsdk.dll ..\Debug\</Command>
