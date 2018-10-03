@@ -124,6 +124,7 @@
   <ItemGroup>
     <ClInclude Include="Framework\Camera.h" />
     <ClInclude Include="Framework\RenderDevice.h" />
+    <ClInclude Include="Framework\ResourceManager.h" />
     <ClInclude Include="Framework\WinApp.h" />
     <ClInclude Include="Mathematics\Float2.h" />
     <ClInclude Include="Mathematics\Float3.h" />
@@ -141,6 +142,7 @@
   <ItemGroup>
     <ClCompile Include="Framework\Camera.cpp" />
     <ClCompile Include="Framework\RenderDevice.cpp" />
+    <ClCompile Include="Framework\ResourceManager.cpp" />
     <ClCompile Include="Framework\WinApp.cpp" />
     <ClCompile Include="Mathematics\Float2.cpp" />
     <ClCompile Include="Mathematics\Float3.cpp" />

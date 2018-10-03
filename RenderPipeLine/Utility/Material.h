@@ -11,9 +11,10 @@ using namespace std;
 #ifndef Material_H_
 #define Material_H_
 
-struct Material
+class Material
 {
-	string texture;
+public:
+	string TextureName;
 };
 
 #endif

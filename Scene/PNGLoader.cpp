@@ -4,6 +4,15 @@
 #include <vector>
 #include "..\Lodepng\lodepng.h"
 
+PNGLoader::PNGLoader()
+{
+
+}
+
+PNGLoader::~PNGLoader()
+{
+}
+
 Texture* PNGLoader::LoadTexture(string filename)
 {
 	std::vector<unsigned char> png;

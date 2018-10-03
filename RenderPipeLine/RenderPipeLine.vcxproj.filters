@@ -74,6 +74,9 @@
     <ClInclude Include="Utility\Texture.h">
       <Filter>Header Files\Utility</Filter>
     </ClInclude>
+    <ClInclude Include="Framework\ResourceManager.h">
+      <Filter>Header Files\Framework</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Framework\RenderDevice.cpp">
@@ -114,6 +117,9 @@
     </ClCompile>
     <ClCompile Include="Utility\Texture.cpp">
       <Filter>Source Files\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="Framework\ResourceManager.cpp">
+      <Filter>Source Files\Framework</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

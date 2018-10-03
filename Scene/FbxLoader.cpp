@@ -9,6 +9,8 @@
 #include <fbxsdk/scene/geometry/fbxgeometry.h>
 #include <string>
 #include <map>
+#include "../RenderPipeLine/Framework/ResourceManager.h"
+#include "PNGLoader.h"
 
 #ifdef IOS_REF
 #undef  IOS_REF
@@ -446,8 +448,6 @@ void FbxLoader::ProcessMaterialConnection(FbxMesh * pMesh, vector<int>& matertia
 
 void FbxLoader::ProcessMaterial(FbxMesh * pMesh, vector<Material>& materials)
 {
-	int materialCount;
-
 	if (pMesh && pMesh->GetNode())
 	{
 		FbxNode* pNode = pMesh->GetNode();
@@ -456,7 +456,9 @@ void FbxLoader::ProcessMaterial(FbxMesh * pMesh, vector<Material>& materials)
 		for (int materialIndex = 0; materialIndex < materialCount; materialIndex++)
 		{
 			FbxSurfaceMaterial* pSurfaceMaterial = pNode->GetMaterial(materialIndex);
-			materials.push_back(Material{ pSurfaceMaterial->GetName() });
+
+			auto materialName = pSurfaceMaterial->GetName();
+			ResourceManager::getSingletonPtr()->AddMaterial(materialName, new Material());
 		}
 	}
 }
@@ -584,13 +586,16 @@ void FindAndDisplayTextureInfoByProperty(FbxProperty pProperty, bool& pDisplayHe
 					materialTexMap.insert(std::make_pair(materialName, textureName));
 
 					FbxFileTexture *lFileTexture = FbxCast<FbxFileTexture>(lTexture);
-					auto test = lFileTexture->GetFileName();
-					
+					auto filePath = lFileTexture->GetFileName();
+					auto pngTexture = PNGLoader::getSingletonPtr()->LoadTexture(filePath);
+					if (pngTexture != nullptr)
+					{
+						ResourceManager::getSingletonPtr()->AddTexture(textureName, pngTexture);
+					}
+
 					//DisplayString("    Textures for ", pProperty.GetName());
 					//DisplayInt("        Texture ", j);
 					//DisplayTextureInfo(lTexture, -1);
-
-					int pause = 0;
 				}
 			}
 		}
